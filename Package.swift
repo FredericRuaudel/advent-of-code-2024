@@ -4,6 +4,7 @@
 @preconcurrency import PackageDescription
 
 enum Dependency {
+    static let customDump: Target.Dependency = .product(name: "CustomDump", package: "swift-custom-dump")
     static let parsing: Target.Dependency = .product(name: "Parsing", package: "swift-parsing")
 }
 
@@ -13,9 +14,11 @@ let package = Package(
     products: [
         .library(name: "Core", targets: ["Core"]),
         .library(name: "Day1", targets: ["Day1"]),
+        .library(name: "Day2", targets: ["Day2"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
+        .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
     ],
     targets: [
         .executableTarget(
@@ -23,6 +26,7 @@ let package = Package(
             dependencies: [
                 "Core",
                 "Day1",
+                "Day2",
             ]
         ),
         .target(name: "Core"),
@@ -35,6 +39,19 @@ let package = Package(
             dependencies: [
                 "Core",
                 "Day1",
+            ]
+        ),
+        .target(name: "Day2", dependencies: [
+            "Core",
+            Dependency.parsing,
+        ]),
+        .testTarget(
+            name: "Day2Tests",
+            dependencies: [
+                "Core",
+                "Day2",
+                Dependency.customDump,
+                Dependency.parsing,
             ]
         ),
     ]
