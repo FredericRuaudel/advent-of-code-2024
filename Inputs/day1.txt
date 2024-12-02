@@ -1,6 +1,3 @@
-import Parsing
-
-let input = """
 28186   35627
 51854   34597
 19211   51032
@@ -1001,48 +998,3 @@ let input = """
 83450   76669
 62947   25771
 55820   53096
-"""
-
-struct LocationIdTupleParser: Parser {
-    var body: some Parser<Substring, (Int, Int)> {
-        Int.parser()
-        Whitespace()
-        Int.parser()
-    }
-}
-
-struct MainParser: Parser {
-    var body: some Parser<Substring, [(Int, Int)]> {
-        Many {
-            LocationIdTupleParser()
-        } separator: {
-            "\n"
-        }
-    }
-}
-
-let values = try MainParser().parse(input)
-
-var (leftLocationIds, rightLocationIds) = values.reduce(([Int](), [Int]())) { partialResult, tuple in
-    var nextResult = partialResult
-    nextResult.0.append(tuple.0)
-    nextResult.1.append(tuple.1)
-    return nextResult
-}
-
-leftLocationIds.sort()
-rightLocationIds.sort()
-
-let distances = zip(leftLocationIds, rightLocationIds).map { leftId, rightId in
-    abs(leftId - rightId)
-}
-
-print("Distances total: \(distances.reduce(0, +))")
-
-// Part II
-
-let similarityScores = leftLocationIds.map { leftId in 
-    leftId * rightLocationIds.filter { $0 == leftId }.count
-}
-
-print("Similarity score: \(similarityScores.reduce(0, +))")
