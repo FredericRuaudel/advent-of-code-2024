@@ -4,6 +4,12 @@ This repo is hosting my take on the [Advent of Code challenge 2024](https://adve
 
 ## How to run
 
+Clean the repo if needed with command:
+
+```
+swift package clean
+```
+
 Run tests with command:
 
 ```
