@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:template}",
+            "name": "Debug template",
+            "program": "${workspaceFolder:template}/.build/debug/template",
+            "preLaunchTask": "swift: Build Debug template"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:template}",
+            "name": "Release template",
+            "program": "${workspaceFolder:template}/.build/release/template",
+            "preLaunchTask": "swift: Build Release template"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:template}",
+            "name": "Debug AoC_dX",
+            "program": "${workspaceFolder:template}/.build/debug/AoC_dX",
+            "preLaunchTask": "swift: Build Debug AoC_dX"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:template}",
+            "name": "Release AoC_dX",
+            "program": "${workspaceFolder:template}/.build/release/AoC_dX",
+            "preLaunchTask": "swift: Build Release AoC_dX"
+        }
+    ]
+}
