@@ -6,6 +6,7 @@
 enum Dependency {
     static let customDump: Target.Dependency = .product(name: "CustomDump", package: "swift-custom-dump")
     static let parsing: Target.Dependency = .product(name: "Parsing", package: "swift-parsing")
+    static let issueReporting: Target.Dependency = .product(name: "IssueReporting", package: "xctest-dynamic-overlay")
 }
 
 let package = Package(
@@ -20,6 +21,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
+        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.4.3"),
     ],
     targets: [
         .executableTarget(
@@ -58,6 +60,7 @@ let package = Package(
         ),
         .target(name: "Day3", dependencies: [
             "Core",
+            Dependency.issueReporting,
             Dependency.parsing,
         ]),
         .testTarget(

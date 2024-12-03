@@ -1,4 +1,5 @@
 import Core
+import IssueReporting
 import Parsing
 
 struct ValidNumber: Equatable {
@@ -36,6 +37,73 @@ struct Mul: Equatable {
     }
 }
 
+enum Operation: Equatable {
+    case mul(Mul)
+    case `do`
+    case dont
+}
+
+struct OperationProcessor: Equatable {
+    var isActive = true
+    var operations: [Mul] = []
+
+    mutating func append(_ mul: Mul) {
+        if isActive { operations.append(mul) }
+    }
+
+    func process() -> Int {
+        operations.reduce(0, +)
+    }
+}
+
+extension Array where Element == Operation {
+    func toOperationProcessor() -> OperationProcessor {
+        reduce(into: OperationProcessor(operations: [])) { processor, operation in
+            switch operation {
+            case .do:
+                processor.isActive = true
+            case .dont:
+                processor.isActive = false
+            case let .mul(mul):
+                processor.append(mul)
+            }
+        }
+    }
+}
+
+extension Mul {
+    func asOperation() -> Operation {
+        .mul(self)
+    }
+}
+
+struct MyParsingError: Error {}
+
+struct MyPrefixUpTo<Input: Collection, Parsers: Parser>: Parser
+    where Parsers.Input == Input, Input.SubSequence == Input
+{
+    let parsers: Parsers
+
+    init(@ParserBuilder<Input> _ build: () -> Parsers) {
+        parsers = build()
+    }
+
+    func parse(_ input: inout Parsers.Input) throws -> Input {
+        let original = input
+        var currentIndex = original.startIndex
+        while input.isEmpty == false {
+            if let _ = try? parsers.parse(&input) {
+                input = original[currentIndex...]
+                return original[..<currentIndex]
+            } else {
+                input.removeFirst()
+                currentIndex = original.index(after: currentIndex)
+            }
+        }
+        throw MyParsingError()
+    }
+}
+
 struct MulParser: Parser {
     var body: some Parser<Substring, Mul?> {
         Parse(Mul.init) {
@@ -48,21 +116,52 @@ struct MulParser: Parser {
     }
 }
 
+struct OperationParser: Parser {
+    var body: some Parser<Substring, Operation?> {
+        OneOf {
+            MulParser().map { $0?.asOperation() }
+            "do()".map { .do }
+            "don't()".map { .dont }
+        }
+    }
+}
+
 struct CorruptedOrMulParser: Parser {
     var body: some Parser<Substring, Mul?> {
         OneOf {
             MulParser()
-            "mul(".map { _ in nil }
-            Skip { PrefixUpTo("mul(") }.map { _ in nil }
+            Skip { MyPrefixUpTo { MulParser() } }.map { _ in nil }
+            Rest().map { _ in nil }
+        }
+    }
+}
+
+struct CorruptedOrOperationParser: Parser {
+    var body: some Parser<Substring, Operation?> {
+        OneOf {
+            OperationParser()
+            Skip { MyPrefixUpTo { OperationParser() }}.map { _ in nil }
             Rest().map { _ in nil }
         }
     }
 }
 
 struct AllMulParser: Parser {
-    var body: some Parser<Substring, [Mul?]> {
-        Many {
+    var body: some Parser<Substring, [Mul]> {
+        Many(into: [Mul]()) { (array: inout [Mul], value: Mul?) in
+            if let value { array.append(value) }
+        } element: {
             CorruptedOrMulParser()
+        }
+    }
+}
+
+struct AllOperationParser: Parser {
+    var body: some Parser<Substring, [Operation]> {
+        Many(into: [Operation.do]) { (array: inout [Operation], value: Operation?) in
+            if let value { array.append(value) }
+        } element: {
+            CorruptedOrOperationParser()
         }
     }
 }
@@ -71,11 +170,12 @@ public struct Day3: AoCDay {
     public init() {}
 
     public func runPart1(with input: String) throws -> String {
-        let mulList = try AllMulParser().parse(input).compactMap { $0 }
+        let mulList = try AllMulParser().parse(input)
         return "\(mulList.reduce(0,+))"
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        let operationList = try AllOperationParser().parse(input)
+        return "\(operationList.toOperationProcessor().process())"
     }
 }
