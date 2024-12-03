@@ -1,6 +1,41 @@
 import Core
 import Parsing
 
+extension Array where Element == Int {
+    func isAllIncreasing() -> Bool {
+        sorted() == self
+    }
+
+    func isAllDecreasing() -> Bool {
+        sorted().reversed() == self
+    }
+
+    func hasAnyAdjacentPairBetween1and3() -> Bool {
+        let allValuesByAdjacentPair = zip(dropLast(), dropFirst()).map { $0 }
+
+        let allValidValuesByAdjacentPair = allValuesByAdjacentPair.filter { first, second in
+            let difference = abs(first - second)
+            return difference >= 1 && difference <= 3
+        }
+
+        return allValuesByAdjacentPair.count == allValidValuesByAdjacentPair.count
+    }
+
+    func isSafe() -> Bool {
+        (isAllIncreasing() || isAllDecreasing()) && hasAnyAdjacentPairBetween1and3()
+    }
+
+    func allPossibleArraysWithOneElementDropped() -> [Self] {
+        map { _ in self }
+            .enumerated()
+            .map { index, array in
+                var reducedArray = array
+                reducedArray.remove(at: index)
+                return reducedArray
+            }
+    }
+}
+
 struct ValidReport: Equatable {
     var levels: [Int]
 
@@ -13,23 +48,12 @@ struct ValidReport: Equatable {
 struct SafeReport: Equatable {
     var levels: [Int]
 
-    init?(from report: ValidReport) {
+    init?(from report: ValidReport, dampened isDampened: Bool) {
         let levels = report.levels
-        guard
-            levels.sorted() == levels ||
-            levels.sorted().reversed() == levels
-        else {
+        guard levels.isSafe() || (isDampened && levels.allPossibleArraysWithOneElementDropped().contains { $0.isSafe() }) else {
             return nil
         }
 
-        let allLevelsByAdjacentPair = zip(levels.dropLast(), levels.dropFirst()).map { $0 }
-
-        let allSafeLevelsByAdjacentPair = allLevelsByAdjacentPair.filter { first, second in
-            let difference = abs(first - second)
-            return difference >= 1 && difference <= 3
-        }
-
-        guard allLevelsByAdjacentPair.count == allSafeLevelsByAdjacentPair.count else { return nil }
         self.levels = report.levels
     }
 }
@@ -40,7 +64,7 @@ struct ValidReportParser: Parser {
             Many {
                 Int.parser()
             } separator: {
-                " "
+                Whitespace(.horizontal)
             }
         }
     }
@@ -51,7 +75,7 @@ struct AllValidReportParser: Parser {
         Many {
             ValidReportParser()
         } separator: {
-            "\n"
+            Whitespace(1, .vertical)
         }
     }
 }
@@ -62,10 +86,12 @@ public struct Day2: AoCDay {
     public func runPart1(with input: String) throws -> String {
         let allValidReports = try AllValidReportParser().parse(input).compactMap { $0 }
 
-        return "\(allValidReports.compactMap { SafeReport(from: $0) }.count)"
+        return "\(allValidReports.compactMap { SafeReport(from: $0, dampened: false) }.count)"
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        let allValidReports = try AllValidReportParser().parse(input).compactMap { $0 }
+
+        return "\(allValidReports.compactMap { SafeReport(from: $0, dampened: true) }.count)"
     }
 }
