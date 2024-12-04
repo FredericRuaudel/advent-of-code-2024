@@ -73,34 +73,34 @@ struct Day3Tests {
         try expectNoDifference(MulParser().parse("mul(123,123)"), Mul(123, 123))
     }
 
-    @Test("CorruptedOrMulParser should parse a valid mul object")
+    @Test("corruptedOrMulParser should parse a valid mul object")
     func corruptedOrMulParserParseValidMul() throws {
-        try expectNoDifference(CorruptedOrMulParser().parse("mul(123,123)"), Mul(123, 123))
+        try expectNoDifference(corruptedOrMulParser.parse("mul(123,123)"), Mul(123, 123))
     }
 
-    @Test("CorruptedOrMulParser should parse corrupted values until the start of a valid mul")
+    @Test("corruptedOrMulParser should parse corrupted values until the start of a valid mul")
     func corruptedOrMulParserCorruptedAndMul() throws {
         var input: Substring = "%&mul[3,7]!@^do_not_mul(1,1)"
-        try expectNoDifference(CorruptedOrMulParser().parse(&input), nil)
+        try expectNoDifference(corruptedOrMulParser.parse(&input), nil)
         #expect(input == "mul(1,1)")
     }
 
-    @Test("CorruptedOrMulParser should parse everything if not a valid mul")
+    @Test("corruptedOrMulParser should parse everything if not a valid mul")
     func corruptedOrMulParserInvalidMulPrefix() throws {
         var input: Substring = "mul(123,123]"
-        try expectNoDifference(CorruptedOrMulParser().parse(&input), nil)
+        try expectNoDifference(corruptedOrMulParser.parse(&input), nil)
         #expect(input == "")
     }
 
-    @Test("CorruptedOrMulParser should parse corrupted value starting with an invalid mul")
+    @Test("corruptedOrMulParser should parse corrupted value starting with an invalid mul")
     func corruptedOrMulParserCorruptedMul() throws {
-        try expectNoDifference(CorruptedOrMulParser().parse("mul[123,123)"), nil)
+        try expectNoDifference(corruptedOrMulParser.parse("mul[123,123)"), nil)
     }
 
-    @Test("AllMulParser should parse a long string extracting all Mul objects from it")
+    @Test("allMulParser should parse a long string extracting all Mul objects from it")
     func allMulParserTest() throws {
         var input: Substring = inputPart1[...]
-        try expectNoDifference(AllMulParser().parse(&input), [Mul(2, 4), Mul(5, 5), Mul(11, 8), Mul(8, 5)])
+        try expectNoDifference(allMulParser.parse(&input), [Mul(2, 4), Mul(5, 5), Mul(11, 8), Mul(8, 5)])
         #expect(input == "")
     }
 
@@ -156,65 +156,64 @@ struct Day3Tests {
         #expect(input == "mul(1,1)")
     }
 
-    @Test("CorruptedOrOperationParser should parse a valid mul object")
+    @Test("corruptedOrOperationParser should parse a valid mul object")
     func corruptedOrOperationParserParseValidMul() throws {
-        try expectNoDifference(CorruptedOrOperationParser().parse("mul(123,123)"), Mul(123, 123)?.asOperation())
+        try expectNoDifference(corruptedOrOperationParser.parse("mul(123,123)"), Mul(123, 123)?.asOperation())
     }
 
-    @Test("CorruptedOrOperationParser should parse a valid do object")
+    @Test("corruptedOrOperationParser should parse a valid do object")
     func corruptedOrOperationParserParseValidDo() throws {
-        try expectNoDifference(CorruptedOrOperationParser().parse("do()"), Operation.do)
+        try expectNoDifference(corruptedOrOperationParser.parse("do()"), Operation.do)
     }
 
-    @Test("CorruptedOrOperationParser should parse a valid don't object")
+    @Test("corruptedOrOperationParser should parse a valid don't object")
     func corruptedOrOperationParserParseValidDont() throws {
-        try expectNoDifference(CorruptedOrOperationParser().parse("don't()"), Operation.dont)
+        try expectNoDifference(corruptedOrOperationParser.parse("don't()"), Operation.dont)
     }
 
-    @Test("CorruptedOrOperationParser should parse corrupted values until the start of a valid mul")
+    @Test("corruptedOrOperationParser should parse corrupted values until the start of a valid mul")
     func corruptedOrOperationParserCorruptedAndMul() throws {
         var input: Substring = "%&mul[3,7]!@^do_not_mul(1,1)"
-        try expectNoDifference(CorruptedOrOperationParser().parse(&input), nil)
+        try expectNoDifference(corruptedOrOperationParser.parse(&input), nil)
         #expect(input == "mul(1,1)")
     }
 
-    @Test("CorruptedOrOperationParser should parse corrupted values until the start of a valid do")
+    @Test("corruptedOrOperationParser should parse corrupted values until the start of a valid do")
     func corruptedOrOperationParserCorruptedAndDo() throws {
         var input: Substring = "%&mul[3,7]!@^do_not_do()"
-        try expectNoDifference(CorruptedOrOperationParser().parse(&input), nil)
+        try expectNoDifference(corruptedOrOperationParser.parse(&input), nil)
         #expect(input == "do()")
     }
 
-    @Test("CorruptedOrOperationParser should parse corrupted values until the start of a valid don't")
+    @Test("corruptedOrOperationParser should parse corrupted values until the start of a valid don't")
     func corruptedOrOperationParserCorruptedAndDont() throws {
         var input: Substring = "%&mul[3,7]!@^don't_not_don't()"
-        try expectNoDifference(CorruptedOrOperationParser().parse(&input), nil)
+        try expectNoDifference(corruptedOrOperationParser.parse(&input), nil)
         #expect(input == "don't()")
     }
 
-    @Test("CorruptedOrOperationParser should parse everything if not a valid operation")
+    @Test("corruptedOrOperationParser should parse everything if not a valid operation")
     func corruptedOrOperationParserInvalidMulPrefix() throws {
         var input: Substring = "mul(123,123]"
-        try expectNoDifference(CorruptedOrOperationParser().parse(&input), nil)
+        try expectNoDifference(corruptedOrOperationParser.parse(&input), nil)
         #expect(input == "")
         input = "do(]"
-        try expectNoDifference(CorruptedOrOperationParser().parse(&input), nil)
+        try expectNoDifference(corruptedOrOperationParser.parse(&input), nil)
         #expect(input == "")
         input = "don't(]"
-        try expectNoDifference(CorruptedOrOperationParser().parse(&input), nil)
+        try expectNoDifference(corruptedOrOperationParser.parse(&input), nil)
         #expect(input == "")
     }
 
-    @Test("CorruptedOrOperationParser should parse corrupted value starting with an invalid mul")
+    @Test("corruptedOrOperationParser should parse corrupted value starting with an invalid mul")
     func corruptedOrOperationParserCorruptedMul() throws {
-        try expectNoDifference(CorruptedOrOperationParser().parse("mul[123,123)"), nil)
+        try expectNoDifference(corruptedOrOperationParser.parse("mul[123,123)"), nil)
     }
 
-    @Test("AllOperationParser should parse a long string extracting all Mul objects from it")
+    @Test("allOperationParser should parse a long string extracting all Mul objects from it")
     func allOperationParserTest() throws {
         var input: Substring = inputPart2[...]
-        try expectNoDifference(AllOperationParser().parse(&input), [
-            Operation.do,
+        try expectNoDifference(allOperationParser.parse(&input), [
             Mul(2, 4)?.asOperation(),
             .dont,
             Mul(5, 5)?.asOperation(),
@@ -256,9 +255,9 @@ struct Day3Tests {
         let vm1 = try #require(Mul(2, 3))
         let vm2 = try #require(Mul(2, 5))
         let vm3 = try #require(Mul(100, 1))
-        let input: [Operation] = [Operation.do, .mul(vm1), Operation.dont, .mul(vm3), Operation.do, .mul(vm2)]
+        let input: [Operation] = [.mul(vm1), Operation.dont, .mul(vm3), Operation.do, .mul(vm2)]
         expectNoDifference(input.toOperationProcessor(), OperationProcessor(isActive: true, operations: [
-            vm1, vm2
+            vm1, vm2,
         ]))
     }
 

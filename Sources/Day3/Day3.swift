@@ -58,7 +58,7 @@ struct OperationProcessor: Equatable {
 
 extension Array where Element == Operation {
     func toOperationProcessor() -> OperationProcessor {
-        reduce(into: OperationProcessor(operations: [])) { processor, operation in
+        reduce(into: OperationProcessor()) { processor, operation in
             switch operation {
             case .do:
                 processor.isActive = true
@@ -92,10 +92,11 @@ struct MyPrefixUpTo<Input: Collection, Parsers: Parser>: Parser
         let original = input
         var currentIndex = original.startIndex
         while input.isEmpty == false {
-            if let _ = try? parsers.parse(&input) {
+            do {
+                _ = try parsers.parse(&input)
                 input = original[currentIndex...]
                 return original[..<currentIndex]
-            } else {
+            } catch {
                 input.removeFirst()
                 currentIndex = original.index(after: currentIndex)
             }
@@ -126,56 +127,50 @@ struct OperationParser: Parser {
     }
 }
 
-struct CorruptedOrMulParser: Parser {
-    var body: some Parser<Substring, Mul?> {
+struct CorruptedOrParser<P: Parser & Sendable, Wrapped>: Parser, Sendable
+    where P.Output == Wrapped?, P.Input == Substring
+{
+    var parser: P
+
+    var body: some Parser<Substring, Wrapped?> {
         OneOf {
-            MulParser()
-            Skip { MyPrefixUpTo { MulParser() } }.map { _ in nil }
+            parser
+            Skip { MyPrefixUpTo { parser } }.map { _ in nil }
             Rest().map { _ in nil }
         }
     }
 }
 
-struct CorruptedOrOperationParser: Parser {
-    var body: some Parser<Substring, Operation?> {
-        OneOf {
-            OperationParser()
-            Skip { MyPrefixUpTo { OperationParser() }}.map { _ in nil }
-            Rest().map { _ in nil }
+struct AllParser<P: Parser & Sendable, Wrapped>: Parser, Sendable
+where P.Output == Wrapped?, P.Input == Substring
+{
+    var parser: P
+    init(of parser: P) { self.parser = parser}
+
+    var body: some Parser<Substring, [Wrapped]> {
+        Many(into: [Wrapped]()) { (array: inout [Wrapped], value: Wrapped?) in
+            if let value { array.append(value) }
+        } element: {
+            parser
         }
     }
 }
 
-struct AllMulParser: Parser {
-    var body: some Parser<Substring, [Mul]> {
-        Many(into: [Mul]()) { (array: inout [Mul], value: Mul?) in
-            if let value { array.append(value) }
-        } element: {
-            CorruptedOrMulParser()
-        }
-    }
-}
-
-struct AllOperationParser: Parser {
-    var body: some Parser<Substring, [Operation]> {
-        Many(into: [Operation.do]) { (array: inout [Operation], value: Operation?) in
-            if let value { array.append(value) }
-        } element: {
-            CorruptedOrOperationParser()
-        }
-    }
-}
+let corruptedOrMulParser = CorruptedOrParser(parser: MulParser())
+let corruptedOrOperationParser = CorruptedOrParser(parser: OperationParser())
+let allMulParser = AllParser(of: corruptedOrMulParser)
+let allOperationParser = AllParser(of: corruptedOrOperationParser)
 
 public struct Day3: AoCDay {
     public init() {}
 
     public func runPart1(with input: String) throws -> String {
-        let mulList = try AllMulParser().parse(input)
+        let mulList = try allMulParser.parse(input)
         return "\(mulList.reduce(0,+))"
     }
 
     public func runPart2(with input: String) throws -> String {
-        let operationList = try AllOperationParser().parse(input)
+        let operationList = try allOperationParser.parse(input)
         return "\(operationList.toOperationProcessor().process())"
     }
 }
