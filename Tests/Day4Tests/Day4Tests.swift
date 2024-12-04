@@ -74,7 +74,7 @@ struct Day4Tests {
 
     let smallGrid = ["XM", "AS"]
 
-    @Test("toCharacterGrid should return array of array characters")
+    @Test("toCharacterGrid should return array of array of characters")
     func toCharacterGridTest() throws {
         let smallInput = """
         XM
@@ -200,7 +200,7 @@ struct Day4Tests {
             "SXS",
             "SXM",
         ]
-        expectNoDifference(grid.crossWords(from: Coord(1, 1)), Pair(
+        expectNoDifference(grid.crossWords(centeredAt: Coord(1, 1)), Pair(
             topLeft: "XXM",
             topRight: "XXS"
         ))

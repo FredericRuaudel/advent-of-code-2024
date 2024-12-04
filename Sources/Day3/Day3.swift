@@ -2,12 +2,74 @@ import Core
 import IssueReporting
 import Parsing
 
-struct ValidNumber: Equatable {
-    var value: Int
+public struct Day3: AoCDay {
+    public init() {}
 
-    init?(_ value: Int) {
-        guard value < 1000 else { return nil }
-        self.value = value
+    public func runPart1(with input: String) throws -> String {
+        let mulList = try allMulParser.parse(input)
+        return "\(mulList.reduce(0,+))"
+    }
+
+    public func runPart2(with input: String) throws -> String {
+        let operationList = try allOperationParser.parse(input)
+        return "\(operationList.toOperationProcessor().process())"
+    }
+}
+
+let allMulParser = AllParser(of: corruptedOrMulParser)
+let corruptedOrMulParser = CorruptedOrParser(parser: MulParser())
+
+let allOperationParser = AllParser(of: corruptedOrOperationParser)
+let corruptedOrOperationParser = CorruptedOrParser(parser: OperationParser())
+
+struct AllParser<P: Parser & Sendable, Wrapped>: Parser, Sendable
+    where P.Output == Wrapped?, P.Input == Substring
+{
+    var parser: P
+    init(of parser: P) { self.parser = parser }
+
+    var body: some Parser<Substring, [Wrapped]> {
+        Many(into: [Wrapped]()) { (array: inout [Wrapped], value: Wrapped?) in
+            if let value { array.append(value) }
+        } element: {
+            parser
+        }
+    }
+}
+
+struct CorruptedOrParser<P: Parser & Sendable, Wrapped>: Parser, Sendable
+    where P.Output == Wrapped?, P.Input == Substring
+{
+    var parser: P
+
+    var body: some Parser<Substring, Wrapped?> {
+        OneOf {
+            parser
+            Skip { MyPrefixUpTo { parser } }.map { _ in nil }
+            Rest().map { _ in nil }
+        }
+    }
+}
+
+struct MulParser: Parser {
+    var body: some Parser<Substring, Mul?> {
+        Parse(Mul.init) {
+            "mul("
+            Int.parser()
+            ","
+            Int.parser()
+            ")"
+        }
+    }
+}
+
+struct OperationParser: Parser {
+    var body: some Parser<Substring, Operation?> {
+        OneOf {
+            MulParser().map { $0?.asOperation() }
+            "do()".map { .do }
+            "don't()".map { .dont }
+        }
     }
 }
 
@@ -37,10 +99,25 @@ struct Mul: Equatable {
     }
 }
 
+struct ValidNumber: Equatable {
+    var value: Int
+
+    init?(_ value: Int) {
+        guard value < 1000 else { return nil }
+        self.value = value
+    }
+}
+
 enum Operation: Equatable {
     case mul(Mul)
     case `do`
     case dont
+}
+
+extension Mul {
+    func asOperation() -> Operation {
+        .mul(self)
+    }
 }
 
 struct OperationProcessor: Equatable {
@@ -71,12 +148,6 @@ extension Array where Element == Operation {
     }
 }
 
-extension Mul {
-    func asOperation() -> Operation {
-        .mul(self)
-    }
-}
-
 struct MyParsingError: Error {}
 
 struct MyPrefixUpTo<Input: Collection, Parsers: Parser>: Parser
@@ -102,75 +173,5 @@ struct MyPrefixUpTo<Input: Collection, Parsers: Parser>: Parser
             }
         }
         throw MyParsingError()
-    }
-}
-
-struct MulParser: Parser {
-    var body: some Parser<Substring, Mul?> {
-        Parse(Mul.init) {
-            "mul("
-            Int.parser()
-            ","
-            Int.parser()
-            ")"
-        }
-    }
-}
-
-struct OperationParser: Parser {
-    var body: some Parser<Substring, Operation?> {
-        OneOf {
-            MulParser().map { $0?.asOperation() }
-            "do()".map { .do }
-            "don't()".map { .dont }
-        }
-    }
-}
-
-struct CorruptedOrParser<P: Parser & Sendable, Wrapped>: Parser, Sendable
-    where P.Output == Wrapped?, P.Input == Substring
-{
-    var parser: P
-
-    var body: some Parser<Substring, Wrapped?> {
-        OneOf {
-            parser
-            Skip { MyPrefixUpTo { parser } }.map { _ in nil }
-            Rest().map { _ in nil }
-        }
-    }
-}
-
-struct AllParser<P: Parser & Sendable, Wrapped>: Parser, Sendable
-where P.Output == Wrapped?, P.Input == Substring
-{
-    var parser: P
-    init(of parser: P) { self.parser = parser}
-
-    var body: some Parser<Substring, [Wrapped]> {
-        Many(into: [Wrapped]()) { (array: inout [Wrapped], value: Wrapped?) in
-            if let value { array.append(value) }
-        } element: {
-            parser
-        }
-    }
-}
-
-let corruptedOrMulParser = CorruptedOrParser(parser: MulParser())
-let corruptedOrOperationParser = CorruptedOrParser(parser: OperationParser())
-let allMulParser = AllParser(of: corruptedOrMulParser)
-let allOperationParser = AllParser(of: corruptedOrOperationParser)
-
-public struct Day3: AoCDay {
-    public init() {}
-
-    public func runPart1(with input: String) throws -> String {
-        let mulList = try allMulParser.parse(input)
-        return "\(mulList.reduce(0,+))"
-    }
-
-    public func runPart2(with input: String) throws -> String {
-        let operationList = try allOperationParser.parse(input)
-        return "\(operationList.toOperationProcessor().process())"
     }
 }

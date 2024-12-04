@@ -77,7 +77,6 @@ let package = Package(
         .target(name: "Day4", dependencies: [
             "Core",
             Dependency.issueReporting,
-            Dependency.parsing,
         ]),
         .testTarget(
             name: "Day4Tests",
@@ -85,7 +84,6 @@ let package = Package(
                 "Core",
                 "Day4",
                 Dependency.customDump,
-                Dependency.parsing,
             ]
         ),
     ]

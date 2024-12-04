@@ -1,37 +1,8 @@
 import Core
 import Parsing
 
-struct LocationIdTupleParser: Parser {
-    var body: some Parser<Substring, (Int, Int)> {
-        Int.parser()
-        Whitespace()
-        Int.parser()
-    }
-}
-
-struct MainParser: Parser {
-    var body: some Parser<Substring, [(Int, Int)]> {
-        Many {
-            LocationIdTupleParser()
-        } separator: {
-            "\n"
-        }
-    }
-}
-
 public struct Day1: AoCDay {
     public init() {}
-
-    private func parse(_ input: String) throws -> ([Int], [Int]) {
-        let values = try MainParser().parse(input)
-
-        return values.reduce(([Int](), [Int]())) { partialResult, tuple in
-            var nextResult = partialResult
-            nextResult.0.append(tuple.0)
-            nextResult.1.append(tuple.1)
-            return nextResult
-        }
-    }
 
     public func runPart1(with input: String) throws -> String {
         var (leftLocationIds, rightLocationIds) = try parse(input)
@@ -53,5 +24,34 @@ public struct Day1: AoCDay {
         }
 
         return "\(similarityScores.reduce(0, +))"
+    }
+
+    private func parse(_ input: String) throws -> ([Int], [Int]) {
+        let values = try MainParser().parse(input)
+
+        return values.reduce(([Int](), [Int]())) { partialResult, tuple in
+            var nextResult = partialResult
+            nextResult.0.append(tuple.0)
+            nextResult.1.append(tuple.1)
+            return nextResult
+        }
+    }
+}
+
+struct LocationIdTupleParser: Parser {
+    var body: some Parser<Substring, (Int, Int)> {
+        Int.parser()
+        Whitespace(.horizontal)
+        Int.parser()
+    }
+}
+
+struct MainParser: Parser {
+    var body: some Parser<Substring, [(Int, Int)]> {
+        Many {
+            LocationIdTupleParser()
+        } separator: {
+            Whitespace(.vertical)
+        }
     }
 }
