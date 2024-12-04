@@ -17,6 +17,7 @@ let package = Package(
         .library(name: "Day1", targets: ["Day1"]),
         .library(name: "Day2", targets: ["Day2"]),
         .library(name: "Day3", targets: ["Day3"]),
+        .library(name: "Day4", targets: ["Day4"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
@@ -31,6 +32,7 @@ let package = Package(
                 "Day1",
                 "Day2",
                 "Day3",
+                "Day4",
             ]
         ),
         .target(name: "Core"),
@@ -68,6 +70,20 @@ let package = Package(
             dependencies: [
                 "Core",
                 "Day3",
+                Dependency.customDump,
+                Dependency.parsing,
+            ]
+        ),
+        .target(name: "Day4", dependencies: [
+            "Core",
+            Dependency.issueReporting,
+            Dependency.parsing,
+        ]),
+        .testTarget(
+            name: "Day4Tests",
+            dependencies: [
+                "Core",
+                "Day4",
                 Dependency.customDump,
                 Dependency.parsing,
             ]
