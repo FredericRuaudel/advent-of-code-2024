@@ -2,6 +2,11 @@ import Core
 import Foundation
 import Parsing
 
+struct Pair<A: Equatable>: Equatable {
+    var topLeft: A
+    var topRight: A
+}
+
 struct Coord: Equatable {
     var x: Int
     var y: Int
@@ -62,11 +67,11 @@ extension Array where Element == String {
         return line[index]
     }
 
-    func allXCoords() -> [Coord] {
+    func allCoords(of character: Character) -> [Coord] {
         var result: [Coord] = []
         for (y, line) in enumerated() {
             for (x, letter) in line.enumerated() {
-                if letter == "X" {
+                if letter == character {
                     result.append(Coord(x, y))
                 }
             }
@@ -74,10 +79,10 @@ extension Array where Element == String {
         return result
     }
 
-    func fourLetters(from origin: Coord, towards direction: Direction) -> String? {
+    func word(from origin: Coord, towards direction: Direction, ofLength count: Int) -> String? {
         var result = ""
         var nextCoord = origin
-        while result.count < 4 {
+        while result.count < count {
             if let nextLetter = char(at: nextCoord) {
                 result += String(nextLetter)
                 nextCoord = nextCoord + direction.offset
@@ -86,6 +91,27 @@ extension Array where Element == String {
             }
         }
         return result
+    }
+
+    func fourLetters(from origin: Coord, towards direction: Direction) -> String? {
+        word(from: origin, towards: direction, ofLength: 4)
+    }
+
+    func crossWords(from center: Coord) -> Pair<String>? {
+        guard
+            let northWestLetter = char(at: center + Direction.northWest.offset),
+            let northEastLetter = char(at: center + Direction.northEast.offset),
+            let centerLetter = char(at: center),
+            let southWestLetter = char(at: center + Direction.southWest.offset),
+            let southEastLetter = char(at: center + Direction.southEast.offset)
+        else {
+            return nil
+        }
+
+        return Pair(
+            topLeft: String([northWestLetter, centerLetter, southEastLetter]),
+            topRight: String([northEastLetter, centerLetter, southWestLetter])
+        )
     }
 
     func allFourLetters(from origin: Coord) -> [String] {
@@ -100,7 +126,7 @@ public struct Day4: AoCDay {
 
     public func runPart1(with input: String) throws -> String {
         let letterGrid = input.toCharacterGrid()
-        let allXCoords = letterGrid.allXCoords()
+        let allXCoords = letterGrid.allCoords(of: "X")
         let xmasCount = allXCoords.flatMap {
             letterGrid.allFourLetters(from: $0)
         }
@@ -109,7 +135,17 @@ public struct Day4: AoCDay {
         return "\(xmasCount)"
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        let letterGrid = input.toCharacterGrid()
+        let allACoords = letterGrid.allCoords(of: "A")
+        let crosswordsCount = allACoords.compactMap {
+            letterGrid.crossWords(from: $0)
+        }
+        .filter {
+            ["MAS", "SAM"].contains($0.topLeft) &&
+                ["MAS", "SAM"].contains($0.topRight)
+        }
+        .count
+        return "\(crosswordsCount)"
     }
 }

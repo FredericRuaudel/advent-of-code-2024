@@ -106,20 +106,6 @@ struct Day4Tests {
         #expect(smallGrid.char(at: Coord(2, 0)) == nil)
     }
 
-    @Test("allXCoords should return the coordinates of all X character in a grid")
-    func allXCoordsTest() {
-        let grid = [
-            "XAX",
-            "SXS",
-            "XXM",
-        ]
-        expectNoDifference(grid.allXCoords(), [
-            Coord(0, 0), Coord(2, 0),
-            Coord(1, 1),
-            Coord(0, 2), Coord(1, 2),
-        ])
-    }
-
     @Test("Direction enum has an offset property that returns a Coord representing how to move in that direction")
     func directionOffsetTest() {
         #expect(Direction.north.offset == Coord(0, -1))
@@ -188,5 +174,41 @@ struct Day4Tests {
     func exampleInputPart1() throws {
         let part1 = try Day4().runPart1(with: inputPart1)
         #expect(part1 == "18")
+    }
+
+    @Test("allCoords should returns all the given character in the grid")
+    func allCoordsTest() {
+        let grid = [
+            "XAX",
+            "SXS",
+            "XXM",
+        ]
+        expectNoDifference(grid.allCoords(of: "X"), [
+            Coord(0, 0), Coord(2, 0),
+            Coord(1, 1),
+            Coord(0, 2), Coord(1, 2),
+        ])
+        expectNoDifference(grid.allCoords(of: "A"), [
+            Coord(1, 0),
+        ])
+    }
+
+    @Test("crossWords should give the two 3 letters words from the given center in shape of X in the grid")
+    func crossWordsTest() {
+        let grid = [
+            "XAX",
+            "SXS",
+            "SXM",
+        ]
+        expectNoDifference(grid.crossWords(from: Coord(1, 1)), Pair(
+            topLeft: "XXM",
+            topRight: "XXS"
+        ))
+    }
+
+    @Test("Part2 with challenge example input")
+    func exampleInputPart2() throws {
+        let part2 = try Day4().runPart2(with: inputPart1)
+        #expect(part2 == "9")
     }
 }
