@@ -113,7 +113,7 @@ struct Day5Tests {
         ])) == false)
     }
 
-    @Test("fetchUpdates should returns all valid SafetyReportUpdateJobs using a list of PageDependencyRule as validator")
+    @Test("fetchUpdates validatedBy should returns all valid SafetyReportUpdateJobs using a list of PageDependencyRule as validator")
     func fetchUpdatesTest() throws {
         let safetyReportUpdateJobs1 = try [
             #require(SafetyReportUpdateJob(pages: [75, 47, 61, 53, 29])),
@@ -349,5 +349,66 @@ struct Day5Tests {
     func exampleInputPart1() throws {
         let part1 = try Day5().runPart1(with: inputPart1)
         #expect(part1 == "143")
+    }
+
+    @Test("fetchUpdates invalidatedBy should return all SafetyReportUpdateJobs invalid according to given PageDependencyRules")
+    func fetchUpdateInvalidTest() throws {
+        let safetyReportUpdateJobs1 = try [
+            #require(SafetyReportUpdateJob(pages: [75, 47, 61, 53, 29])),
+            #require(SafetyReportUpdateJob(pages: [61, 13, 29])),
+        ]
+        let safetyReportUpdateJobs2 = try [
+            #require(SafetyReportUpdateJob(pages: [11, 97, 61, 13, 29])),
+            #require(SafetyReportUpdateJob(pages: [97, 61, 53, 29, 13])),
+        ]
+        let pageDependencyRules = try Set([
+            #require(PageDependencyRule(targetPage: 61, precedingPages: [97, 47, 75])),
+            #require(PageDependencyRule(targetPage: 13, precedingPages: [97, 61, 29, 47, 75, 53])),
+            #require(PageDependencyRule(targetPage: 29, precedingPages: [75, 97, 53, 61, 47])),
+        ])
+        try expectNoDifference(safetyReportUpdateJobs1.fetchUpdates(invalidatedBy: pageDependencyRules), [
+            #require(SafetyReportUpdateJob(pages: [61, 13, 29])),
+        ])
+        try expectNoDifference(safetyReportUpdateJobs2.fetchUpdates(invalidatedBy: pageDependencyRules), [
+            #require(SafetyReportUpdateJob(pages: [11, 97, 61, 13, 29])),
+        ])
+    }
+
+    @Test("fixed method return the invalid SafetyReportUpdateJobs fixed using given PageDependencyRules")
+    func safetyReportUpdateJobFixedTest() throws {
+        let pageDependencyRules = try Set([
+            #require(PageDependencyRule(targetPage: 61, precedingPages: [97, 47, 75])),
+            #require(PageDependencyRule(targetPage: 13, precedingPages: [97, 61, 29, 47, 75, 53])),
+            #require(PageDependencyRule(targetPage: 29, precedingPages: [75, 97, 53, 61, 47])),
+            #require(PageDependencyRule(targetPage: 75, precedingPages: [97])),
+            #require(PageDependencyRule(targetPage: 47, precedingPages: [97, 75])),
+            #require(PageDependencyRule(targetPage: 53, precedingPages: [47, 75, 61, 97])),
+        ])
+        let safetyReportUpdateJob1 = try #require(SafetyReportUpdateJob(pages: [61, 13, 29]))
+        let safetyReportUpdateJob2 = try #require(SafetyReportUpdateJob(pages: [75, 97, 47, 61, 53]))
+        let safetyReportUpdateJob3 = try #require(SafetyReportUpdateJob(pages: [97, 13, 75, 29, 47]))
+        expectNoDifference(safetyReportUpdateJob1.fixed(using: pageDependencyRules), SafetyReportUpdateJob(pages: [61, 29, 13]))
+        expectNoDifference(safetyReportUpdateJob2.fixed(using: pageDependencyRules), SafetyReportUpdateJob(pages: [97, 75, 47, 61, 53]))
+        expectNoDifference(safetyReportUpdateJob3.fixed(using: pageDependencyRules), SafetyReportUpdateJob(pages: [97, 75, 47, 29, 13]))
+    }
+
+    @Test("fixed method return the same SafetyReportUpdateJobs if already valid")
+    func safetyReportUpdateJobFixedForValidJobTest() throws {
+        let pageDependencyRules = try Set([
+            #require(PageDependencyRule(targetPage: 61, precedingPages: [97, 47, 75])),
+            #require(PageDependencyRule(targetPage: 13, precedingPages: [97, 61, 29, 47, 75, 53])),
+            #require(PageDependencyRule(targetPage: 29, precedingPages: [75, 97, 53, 61, 47])),
+            #require(PageDependencyRule(targetPage: 75, precedingPages: [97])),
+            #require(PageDependencyRule(targetPage: 47, precedingPages: [97, 75])),
+            #require(PageDependencyRule(targetPage: 53, precedingPages: [47, 75, 61, 97])),
+        ])
+        let safetyReportUpdateJob1 = try #require(SafetyReportUpdateJob(pages: [61, 29, 13]))
+        expectNoDifference(safetyReportUpdateJob1.fixed(using: pageDependencyRules), safetyReportUpdateJob1)
+    }
+
+    @Test("Part2 with challenge example input")
+    func exampleInputPart2() throws {
+        let part2 = try Day5().runPart2(with: inputPart1)
+        #expect(part2 == "123")
     }
 }

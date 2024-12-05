@@ -16,8 +16,13 @@ public struct Day5: AoCDay {
         return validSafetyReportUpdateJobs.middlePages.sum().asText()
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        guard let dailyPrintingWork = fetchDailyWork(from: input) else { throw Day5Error() }
+        let pageDependencyRules = dailyPrintingWork.pageOrderingRules.convertToPageDependencyRules()
+        let invalidSafetyReportUpdateJobs = dailyPrintingWork.safetyReportUpdateJobs.fetchUpdates(
+            invalidatedBy: pageDependencyRules
+        )
+        return invalidSafetyReportUpdateJobs.map { $0.fixed(using: pageDependencyRules) }.middlePages.sum().asText()
     }
 
     func fetchDailyWork(from input: String) -> DailyPrintingWork? {
@@ -122,6 +127,12 @@ extension Array where Element == SafetyReportUpdateJob {
             safetyReportUpdateJob.validate(with: pageDependencyRules)
         }
     }
+
+    func fetchUpdates(invalidatedBy pageDependencyRules: Set<PageDependencyRule>) -> Self {
+        filter { safetyReportUpdateJob in
+            safetyReportUpdateJob.validate(with: pageDependencyRules) == false
+        }
+    }
 }
 
 struct PageDependencyRule: Equatable, Identifiable, Hashable {
@@ -170,6 +181,20 @@ struct SafetyReportUpdateJob: Equatable {
             checkedPage = remainingPages.removeFirst()
         }
         return true
+    }
+
+    func fixed(using pageDependencyRules: Set<PageDependencyRule>) -> Self {
+        let fixedPages = pages.elements.sorted(by: { firstPage, secondPage in
+            // $0 < $1
+            if let checkedPageRules = pageDependencyRules.first(where: { $0.targetPage == secondPage }),
+               checkedPageRules.precedingPages.contains(firstPage)
+            {
+                return true
+            }
+
+            return false
+        })
+        return SafetyReportUpdateJob(pages: fixedPages) ?? self
     }
 }
 
