@@ -84,8 +84,8 @@ struct PageOrderingRuleParser: Parser {
 }
 
 struct DailyPrintingWork: Equatable {
-    var pageOrderingRules: [PageOrderingRule]
-    var safetyReportUpdateJobs: [SafetyReportUpdateJob]
+    let pageOrderingRules: [PageOrderingRule]
+    let safetyReportUpdateJobs: [SafetyReportUpdateJob]
 
     init?(pageOrderingRules: [PageOrderingRule], safetyReportUpdateJobs: [SafetyReportUpdateJob]) {
         guard pageOrderingRules.isEmpty == false && safetyReportUpdateJobs.isEmpty == false else { return nil }
@@ -111,8 +111,8 @@ extension Array where Element == PageOrderingRule {
 }
 
 struct PageOrderingRule: Equatable {
-    var firstPage: Int
-    var secondPage: Int
+    let firstPage: Int
+    let secondPage: Int
 
     init?(firstPage: Int, secondPage: Int) {
         guard firstPage != secondPage else { return nil }
@@ -135,15 +135,18 @@ extension Array where Element == SafetyReportUpdateJob {
     }
 }
 
-struct PageDependencyRule: Equatable, Identifiable, Hashable {
-    var id: Int { targetPage }
-    var targetPage: Int
-    var precedingPages: Set<Int>
+struct PageDependencyRule: Equatable, Hashable {
+    let targetPage: Int
+    let precedingPages: Set<Int>
 
     init?(targetPage: Int, precedingPages: [Int]) {
         guard precedingPages.count > 0 && precedingPages.contains(targetPage) == false else { return nil }
         self.targetPage = targetPage
         self.precedingPages = Set(precedingPages)
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(targetPage)
     }
 }
 
@@ -154,7 +157,7 @@ extension Array where Element == SafetyReportUpdateJob {
 }
 
 struct SafetyReportUpdateJob: Equatable {
-    var pages: OrderedSet<Int>
+    let pages: OrderedSet<Int>
     var middlePage: Int {
         let middleIndex = pages.count / 2
         return pages[middleIndex]

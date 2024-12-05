@@ -93,12 +93,6 @@ struct Day5Tests {
         expectNoDifference(PageDependencyRule(targetPage: 10, precedingPages: [1, 1, 2])?.precedingPages, Set([1, 2]))
     }
 
-    @Test("A PageDependencyRule should be identified by its targetPage")
-    func pageDependencyRuleIdentityTest() {
-        #expect(PageDependencyRule(targetPage: 10, precedingPages: [1])?.id == 10)
-        #expect(PageDependencyRule(targetPage: 12, precedingPages: [1])?.id == 12)
-    }
-
     @Test("A SafetyReportUpdateJob has a validate method that use a list of PageDependencyRules to check its page ordering")
     func safetyReportUpdateJobValidateTest() throws {
         #expect(try SafetyReportUpdateJob(pages: [75, 47, 61, 53, 29])?.validate(with: Set([
