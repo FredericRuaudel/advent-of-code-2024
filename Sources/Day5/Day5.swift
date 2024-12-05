@@ -188,7 +188,6 @@ struct SafetyReportUpdateJob: Equatable {
 
     func fixed(using pageDependencyRules: Set<PageDependencyRule>) -> Self {
         let fixedPages = pages.elements.sorted(by: { firstPage, secondPage in
-            // $0 < $1
             if let checkedPageRules = pageDependencyRules.first(where: { $0.targetPage == secondPage }),
                checkedPageRules.precedingPages.contains(firstPage)
             {
