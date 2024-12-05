@@ -5,8 +5,12 @@
 
 enum Dependency {
     static let customDump: Target.Dependency = .product(name: "CustomDump", package: "swift-custom-dump")
-    static let parsing: Target.Dependency = .product(name: "Parsing", package: "swift-parsing")
     static let issueReporting: Target.Dependency = .product(name: "IssueReporting", package: "xctest-dynamic-overlay")
+    static let orderedCollections: Target.Dependency = .product(
+        name: "OrderedCollections",
+        package: "swift-collections"
+    )
+    static let parsing: Target.Dependency = .product(name: "Parsing", package: "swift-parsing")
 }
 
 let package = Package(
@@ -18,10 +22,12 @@ let package = Package(
         .library(name: "Day2", targets: ["Day2"]),
         .library(name: "Day3", targets: ["Day3"]),
         .library(name: "Day4", targets: ["Day4"]),
+        .library(name: "Day5", targets: ["Day5"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
+        .package(url: "https://github.com/apple/swift-collections", from: "1.1.4"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
+        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
         .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.4.3"),
     ],
     targets: [
@@ -33,6 +39,7 @@ let package = Package(
                 "Day2",
                 "Day3",
                 "Day4",
+                "Day5",
             ]
         ),
         .target(name: "Core"),
@@ -84,6 +91,21 @@ let package = Package(
                 "Core",
                 "Day4",
                 Dependency.customDump,
+            ]
+        ),
+        .target(name: "Day5", dependencies: [
+            "Core",
+            Dependency.issueReporting,
+            Dependency.orderedCollections,
+            Dependency.parsing,
+        ]),
+        .testTarget(
+            name: "Day5Tests",
+            dependencies: [
+                "Core",
+                "Day5",
+                Dependency.customDump,
+                Dependency.orderedCollections,
             ]
         ),
     ]

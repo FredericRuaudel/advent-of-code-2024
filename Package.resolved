@@ -1,5 +1,5 @@
 {
-  "originHash" : "d7b534c4f012e1b011f95815e96e5594e8847e35393dfdf218dd7c93181326f6",
+  "originHash" : "c2e79e80c08f6bbafcb690451b23e4bc40e3f9fd55428b8e6302481eb5f8062b",
   "pins" : [
     {
       "identity" : "swift-case-paths",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "bc92c4b27f9a84bfb498cdbfdf35d5a357e9161f",
         "version" : "1.5.6"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
       }
     },
     {
