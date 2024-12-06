@@ -206,8 +206,3 @@ extension Array where Element == Int {
     }
 }
 
-extension Int {
-    func asText() -> String {
-        "\(self)"
-    }
-}

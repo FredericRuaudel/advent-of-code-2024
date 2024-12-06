@@ -23,6 +23,7 @@ let package = Package(
         .library(name: "Day3", targets: ["Day3"]),
         .library(name: "Day4", targets: ["Day4"]),
         .library(name: "Day5", targets: ["Day5"]),
+        .library(name: "Day6", targets: ["Day6"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-collections", from: "1.1.4"),
@@ -40,6 +41,7 @@ let package = Package(
                 "Day3",
                 "Day4",
                 "Day5",
+                "Day6",
             ]
         ),
         .target(name: "Core"),
@@ -106,6 +108,18 @@ let package = Package(
                 "Day5",
                 Dependency.customDump,
                 Dependency.orderedCollections,
+            ]
+        ),
+        .target(name: "Day6", dependencies: [
+            "Core",
+            Dependency.issueReporting,
+        ]),
+        .testTarget(
+            name: "Day6Tests",
+            dependencies: [
+                "Core",
+                "Day6",
+                Dependency.customDump,
             ]
         ),
     ]

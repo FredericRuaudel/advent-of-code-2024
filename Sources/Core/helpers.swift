@@ -17,3 +17,9 @@ public enum AoC24 {
         try print("Part2: <\(dayRunner.runPart2(with: dayInput))>")
     }
 }
+
+public extension Int {
+    func asText() -> String {
+        "\(self)"
+    }
+}
