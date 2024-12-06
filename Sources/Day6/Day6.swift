@@ -1,12 +1,5 @@
 import Core
 
-enum Day6Error: Error {
-    case guardNotInMap
-    case infiniteLoopPatrol
-    case invalidMapData
-    case noGuardFound
-}
-
 public struct Day6: AoCDay {
     public init() {}
 
@@ -46,6 +39,13 @@ public struct Day6: AoCDay {
 
         return lab
     }
+}
+
+enum Day6Error: Error {
+    case guardNotInMap
+    case infiniteLoopPatrol
+    case invalidMapData
+    case noGuardFound
 }
 
 class PatrolSimulator {
