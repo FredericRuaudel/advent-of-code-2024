@@ -200,9 +200,3 @@ struct SafetyReportUpdateJob: Equatable {
     }
 }
 
-extension Array where Element == Int {
-    func sum() -> Int {
-        reduce(0,+)
-    }
-}
-
