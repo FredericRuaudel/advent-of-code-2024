@@ -4,6 +4,7 @@
 @preconcurrency import PackageDescription
 
 enum Dependency {
+    static let algorithms: Target.Dependency = .product(name: "Algorithms", package: "swift-algorithms")
     static let customDump: Target.Dependency = .product(name: "CustomDump", package: "swift-custom-dump")
     static let issueReporting: Target.Dependency = .product(name: "IssueReporting", package: "xctest-dynamic-overlay")
     static let orderedCollections: Target.Dependency = .product(
@@ -25,8 +26,10 @@ let package = Package(
         .library(name: "Day5", targets: ["Day5"]),
         .library(name: "Day6", targets: ["Day6"]),
         .library(name: "Day7", targets: ["Day7"]),
+        .library(name: "Day8", targets: ["Day8"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/apple/swift-algorithms", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.1.4"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
         .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
@@ -44,6 +47,7 @@ let package = Package(
                 "Day5",
                 "Day6",
                 "Day7",
+                "Day8",
             ]
         ),
         .target(name: "Core"),
@@ -132,6 +136,19 @@ let package = Package(
             dependencies: [
                 "Core",
                 "Day7",
+                Dependency.customDump,
+            ]
+        ),
+        .target(name: "Day8", dependencies: [
+            "Core",
+            Dependency.algorithms,
+            Dependency.issueReporting,
+        ]),
+        .testTarget(
+            name: "Day8Tests",
+            dependencies: [
+                "Core",
+                "Day8",
                 Dependency.customDump,
             ]
         ),
