@@ -133,6 +133,10 @@ struct Day8Tests {
         expectNoDifference(pair1.pairOfAntinodes(), Pair(Coord(-1, 0), Coord(5, 6)))
         let pair2 = Pair(Coord(2, 2), Coord(3, 1))
         expectNoDifference(pair2.pairOfAntinodes(), Pair(Coord(1, 3), Coord(4, 0)))
+        let pair3 = Pair(Coord(4, 5), Coord(3, 4))
+        expectNoDifference(pair3.pairOfAntinodes(), Pair(Coord(5, 6), Coord(2, 3)))
+        let pair4 = Pair(Coord(4, 0), Coord(3, 1))
+        expectNoDifference(pair4.pairOfAntinodes(), Pair(Coord(5, -1), Coord(2, 2)))
     }
 
     @Test("A Pair should have a method asArray() that returns an array containing first then second element")

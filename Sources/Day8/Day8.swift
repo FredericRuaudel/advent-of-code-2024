@@ -76,38 +76,10 @@ struct Antenna: Equatable {
 
 extension Pair where A == Coord, B == Coord {
     func pairOfAntinodes() -> Self {
-        let xDistanceBetweenCoord = abs(first.x - second.x)
-        let yDistanceBetweenCoord = abs(first.y - second.y)
-        let minX = min(first.x, second.x)
-        let maxX = max(first.x, second.x)
-        let minY = min(first.y, second.y)
-        let maxY = max(first.y, second.y)
-
-        switch first {
-        case Coord(minX, minY):
-            return Pair(
-                Coord(minX - xDistanceBetweenCoord, minY - yDistanceBetweenCoord),
-                Coord(maxX + xDistanceBetweenCoord, maxY + yDistanceBetweenCoord)
-            )
-        case Coord(minX, maxY):
-            return Pair(
-                Coord(minX - xDistanceBetweenCoord, maxY + yDistanceBetweenCoord),
-                Coord(maxX + xDistanceBetweenCoord, minY - yDistanceBetweenCoord)
-            )
-        case Coord(maxX, maxY):
-            return Pair(
-                Coord(maxX + xDistanceBetweenCoord, maxY + yDistanceBetweenCoord),
-                Coord(minX - xDistanceBetweenCoord, minY - yDistanceBetweenCoord)
-            )
-        case Coord(maxX, minY):
-            return Pair(
-                Coord(maxX + xDistanceBetweenCoord, minY - yDistanceBetweenCoord),
-                Coord(minX - xDistanceBetweenCoord, maxY + yDistanceBetweenCoord)
-            )
-        default:
-            reportIssue("This should never happen")
-            return self
-        }
+        Pair(
+            Coord(first.x + (first.x - second.x), first.y + (first.y - second.y)),
+            Coord(second.x + (second.x - first.x), second.y + (second.y - first.y))
+        )
     }
 }
 
