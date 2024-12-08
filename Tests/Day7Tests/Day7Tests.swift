@@ -45,14 +45,14 @@ struct Day7Tests {
         let operators: Set<Operator> = Set([.add, .multiply, .concatenate])
 
         let combinations1 = operators.allOperatorCombination(of: 1)
-        expectNoDifference(combinations1, Set([
+        expectNoDifference(Set(combinations1), Set([
             [.add],
             [.multiply],
             [.concatenate],
         ]))
 
         let combinations2 = operators.allOperatorCombination(of: 2)
-        expectNoDifference(combinations2, Set([
+        expectNoDifference(Set(combinations2), Set([
             [.add, .add],
             [.add, .multiply],
             [.add, .concatenate],
@@ -65,7 +65,7 @@ struct Day7Tests {
         ]))
 
         let combinations3 = operators.allOperatorCombination(of: 3)
-        expectNoDifference(combinations3, Set([
+        expectNoDifference(Set(combinations3), Set([
             [.add, .add, .add],
             [.add, .add, .multiply],
             [.add, .add, .concatenate],

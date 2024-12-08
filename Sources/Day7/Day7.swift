@@ -77,10 +77,10 @@ struct CalibrationEquationParser: Parser {
 }
 
 extension Array where Element == CalibrationEquation {
-    func prepareOperatorCombinations(for operators: Set<Operator>) -> [Int: Set<[Operator]>] {
+    func prepareOperatorCombinations(for operators: Set<Operator>) -> [Int: [[Operator]]] {
         let allCombinationsOfOperandCount = Set(map(\.operandCount))
         return allCombinationsOfOperandCount.reduce(
-            into: [Int: Set<[Operator]>]()
+            into: [Int: [[Operator]]]()
         ) { combinationByCount, operandCount in
             combinationByCount[operandCount] = operators.allOperatorCombination(of: UInt(operandCount - 1))
         }
@@ -132,14 +132,18 @@ enum Operator: Equatable, Hashable, CaseIterable {
 }
 
 extension Set where Element == Operator {
-    func allOperatorCombination(of count: UInt) -> Set<[Self.Element]> {
+    func allOperatorCombination(of count: UInt) -> [[Self.Element]] {
         var result: [[Self.Element]] = [[]]
         let combinedOperators: [Self.Element] = Array(self)
         for _ in 0 ..< count {
             result = result.flatMap { combinationOfi in
-                combinedOperators.map { combinationOfi + [$0] }
+                combinedOperators.map {
+                    var newA = combinationOfi
+                    newA.append($0)
+                    return newA
+                }
             }
         }
-        return Set<[Self.Element]>(result)
+        return result
     }
 }
