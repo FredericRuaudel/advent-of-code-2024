@@ -5,9 +5,19 @@ public struct Day7: AoCDay {
     public init() {}
 
     public func runPart1(with input: String) throws -> String {
+        let validCalibrations = try validCalibrations(for: Set([.add, .multiply]), using: input)
+        return validCalibrations.map(\.result).sum().asText()
+    }
+
+    public func runPart2(with input: String) throws -> String {
+        let validCalibrations = try validCalibrations(for: Set(Operator.allCases), using: input)
+        return validCalibrations.map(\.result).sum().asText()
+    }
+
+    private func validCalibrations(for operators: Set<Operator>, using input: String) throws -> [CalibrationEquation] {
         let finalCalibrations = try generateCalibrationEquations(from: input)
-        let allCombinationsOfOperatorsByOperandCount = finalCalibrations.prepareOperatorCombinations()
-        let validCalibrations = try finalCalibrations.filter { calibrationEquation in
+        let allCombinationsOfOperatorsByOperandCount = finalCalibrations.prepareOperatorCombinations(for: operators)
+        return try finalCalibrations.filter { calibrationEquation in
             guard
                 let operatorCombinations = allCombinationsOfOperatorsByOperandCount[calibrationEquation.operandCount]
             else {
@@ -17,11 +27,6 @@ public struct Day7: AoCDay {
                 try calibrationEquation.isValid(using: operatorCombination)
             }
         }
-        return validCalibrations.map(\.result).sum().asText()
-    }
-
-    public func runPart2(with _: String) throws -> String {
-        ""
     }
 
     private func generateCalibrationEquations(from input: String) throws -> [CalibrationEquation] {
@@ -72,12 +77,12 @@ struct CalibrationEquationParser: Parser {
 }
 
 extension Array where Element == CalibrationEquation {
-    func prepareOperatorCombinations() -> [Int: Set<[Operator]>] {
+    func prepareOperatorCombinations(for operators: Set<Operator>) -> [Int: Set<[Operator]>] {
         let allCombinationsOfOperandCount = Set(map(\.operandCount))
         return allCombinationsOfOperandCount.reduce(
             into: [Int: Set<[Operator]>]()
         ) { combinationByCount, operandCount in
-            combinationByCount[operandCount] = Operator.allOperatorCombination(of: UInt(operandCount - 1))
+            combinationByCount[operandCount] = operators.allOperatorCombination(of: UInt(operandCount - 1))
         }
     }
 }
@@ -109,9 +114,10 @@ struct CalibrationEquation: Equatable {
     }
 }
 
-enum Operator: Equatable, CaseIterable {
+enum Operator: Equatable, Hashable, CaseIterable {
     case add
     case multiply
+    case concatenate
 
     func apply(_ a: Int, _ b: Int) -> Int {
         switch self {
@@ -119,16 +125,21 @@ enum Operator: Equatable, CaseIterable {
             a + b
         case .multiply:
             a * b
+        case .concatenate:
+            Int("\(a)\(b)")!
         }
     }
+}
 
-    static func allOperatorCombination(of count: UInt) -> Set<[Self]> {
-        var result: [[Self]] = [[]]
+extension Set where Element == Operator {
+    func allOperatorCombination(of count: UInt) -> Set<[Self.Element]> {
+        var result: [[Self.Element]] = [[]]
+        let combinedOperators: [Self.Element] = Array(self)
         for _ in 0 ..< count {
             result = result.flatMap { combinationOfi in
-                self.allCases.map { combinationOfi + [$0] }
+                combinedOperators.map { combinationOfi + [$0] }
             }
         }
-        return Set(result)
+        return Set<[Self.Element]>(result)
     }
 }
