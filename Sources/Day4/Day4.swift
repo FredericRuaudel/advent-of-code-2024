@@ -101,14 +101,7 @@ extension Array where Element == String {
     }
 }
 
-struct Coord: Equatable {
-    var x: Int
-    var y: Int
-    init(_ x: Int, _ y: Int) {
-        self.x = x
-        self.y = y
-    }
-
+extension Coord {
     static func + (_ lhs: Self, _ rhs: Self) -> Self {
         Coord(lhs.x + rhs.x, lhs.y + rhs.y)
     }

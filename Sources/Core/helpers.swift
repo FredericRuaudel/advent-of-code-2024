@@ -29,3 +29,18 @@ public extension Array where Element == Int {
         reduce(0,+)
     }
 }
+
+public struct Coord: Equatable, Hashable {
+    public private(set) var x: Int
+    public private(set) var y: Int
+
+    public init(_ x: Int, _ y: Int) {
+        self.x = x
+        self.y = y
+    }
+
+    public func isInsideArea(width: Int, height: Int) -> Bool {
+        x >= 0 && y >= 0 &&
+            x < width && y < height
+    }
+}

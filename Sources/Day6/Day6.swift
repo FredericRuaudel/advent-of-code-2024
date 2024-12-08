@@ -160,33 +160,21 @@ enum Direction: Equatable, Hashable, CaseIterable {
     }
 }
 
-struct Coord: Equatable, Hashable {
-    private(set) var x: Int
-    private(set) var y: Int
-
-    init(_ x: Int, _ y: Int) {
-        self.x = x
-        self.y = y
-    }
-
-    func isInsideArea(width: Int, height: Int) -> Bool {
-        x >= 0 && y >= 0 &&
-            x < width && y < height
-    }
-
+extension Coord {
     func heading(_ heading: Direction) -> Self {
-        var next = self
+        var nextX = self.x
+        var nextY = self.y
         switch heading {
         case .north:
-            next.y -= 1
+            nextY -= 1
         case .south:
-            next.y += 1
+            nextY += 1
         case .east:
-            next.x += 1
+            nextX += 1
         case .west:
-            next.x -= 1
+            nextX -= 1
         }
-        return next
+        return Self(nextX, nextY)
     }
 }
 
