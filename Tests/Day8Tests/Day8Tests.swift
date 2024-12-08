@@ -127,6 +127,30 @@ struct Day8Tests {
         expectNoDifference(array5.allCombinationOfPairs(), [])
     }
 
+    @Test("A Pair of Coord should have a method antinodeBefore that returns the antinodes created before these antennas")
+    func antinodeBeforeTest() {
+        let pair1 = Pair(Coord(1, 2), Coord(3, 4))
+        expectNoDifference(pair1.antinodeBefore(), Coord(-1, 0))
+        let pair2 = Pair(Coord(2, 2), Coord(3, 1))
+        expectNoDifference(pair2.antinodeBefore(), Coord(1, 3))
+        let pair3 = Pair(Coord(4, 5), Coord(3, 4))
+        expectNoDifference(pair3.antinodeBefore(), Coord(5, 6))
+        let pair4 = Pair(Coord(4, 0), Coord(3, 1))
+        expectNoDifference(pair4.antinodeBefore(), Coord(5, -1))
+    }
+
+    @Test("A Pair of Coord should have a method antinodeAfter that returns the antinodes created after these antennas")
+    func antinodeAfterTest() {
+        let pair1 = Pair(Coord(1, 2), Coord(3, 4))
+        expectNoDifference(pair1.antinodeAfter(), Coord(5, 6))
+        let pair2 = Pair(Coord(2, 2), Coord(3, 1))
+        expectNoDifference(pair2.antinodeAfter(), Coord(4, 0))
+        let pair3 = Pair(Coord(4, 5), Coord(3, 4))
+        expectNoDifference(pair3.antinodeAfter(), Coord(2, 3))
+        let pair4 = Pair(Coord(4, 0), Coord(3, 1))
+        expectNoDifference(pair4.antinodeAfter(), Coord(2, 2))
+    }
+
     @Test("A Pair of Coord should have a method pairOfAntinodes that returns the two antinodes created by these antennas")
     func pairOfAntinodesTest() {
         let pair1 = Pair(Coord(1, 2), Coord(3, 4))
@@ -221,5 +245,130 @@ struct Day8Tests {
     func exampleInputPart1() throws {
         let part1 = try Day8().runPart1(with: inputPart)
         #expect(part1 == "14")
+    }
+
+    @Test("Pair<Coord,Coord>.antinodeAndResonantHarmonicsBeforeAndWithinArea() should return all antinodes before pair until exiting area including first coord of given Pair")
+    func antinodeAndResonantHarmonicsBeforeAndWithinAreaTest() {
+        let pair = Pair(Coord(5, 5), Coord(3, 3))
+
+        let antinodes = pair.antinodeAndResonantHarmonicsBeforeAndWithinArea(ofWidth: 10, height: 10)
+
+        expectNoDifference(Set(antinodes), Set([
+            Coord(5, 5), // First coord of Pair
+            Coord(7, 7), // First antinode
+            Coord(9, 9), // Second antinode before exiting 10x10 area
+        ]))
+
+        let smallAreaPair = Pair(Coord(4, 4), Coord(3, 3))
+        let smallAreaAntinodes = smallAreaPair.antinodeAndResonantHarmonicsBeforeAndWithinArea(ofWidth: 6, height: 6)
+
+        expectNoDifference(Set(smallAreaAntinodes), Set([
+            Coord(4, 4), // First coord of pair
+            Coord(5, 5), // Only one antinode fits in 6x6 area
+        ]))
+
+        let edgePair = Pair(Coord(9, 9), Coord(8, 8))
+        let edgeAntinodes = edgePair.antinodeAndResonantHarmonicsBeforeAndWithinArea(ofWidth: 10, height: 10)
+
+        expectNoDifference(Set(edgeAntinodes), Set([
+            Coord(9, 9), // Only first coord of pair
+        ]))
+    }
+
+    @Test("Pair<Coord,Coord>.antinodeAndResonantHarmonicsAfterAndWithinArea() should return all antinodes after pair until exiting area including second coord of given Pair")
+    func antinodeAndResonantHarmonicsAfterAndWithinAreaTest() {
+        let pair = Pair(Coord(5, 5), Coord(3, 3))
+
+        let antinodes = pair.antinodeAndResonantHarmonicsAfterAndWithinArea(ofWidth: 10, height: 10)
+
+        expectNoDifference(Set(antinodes), Set([
+            Coord(3, 3), // Second coord of Pair
+            Coord(1, 1), // First antinode
+        ]))
+
+        let smallAreaPair = Pair(Coord(2, 2), Coord(1, 1))
+        let smallAreaAntinodes = smallAreaPair.antinodeAndResonantHarmonicsAfterAndWithinArea(ofWidth: 6, height: 6)
+
+        expectNoDifference(Set(smallAreaAntinodes), Set([
+            Coord(1, 1), // Second coord of pair
+            Coord(0, 0), // Only one antinode fits in 6x6 area
+        ]))
+
+        let edgePair = Pair(Coord(1, 1), Coord(0, 0))
+        let edgeAntinodes = edgePair.antinodeAndResonantHarmonicsAfterAndWithinArea(ofWidth: 10, height: 10)
+
+        expectNoDifference(Set(edgeAntinodes), Set([
+            Coord(0, 0), // Only second coord of pair
+        ]))
+    }
+
+    @Test("Map.triangulatedAntinodesLocationsAndResonantHarmonics() should return all antinodes and resonant harmonics from pairs of antennas with same frequency on the map")
+    func triangulatedAntinodesAndResonantHarmonicLocationsTest() throws {
+        let map = try #require(Map(width: 10, height: 10, antennas: [
+            Antenna(position: Coord(1, 1), frequency: "a"),
+            Antenna(position: Coord(3, 3), frequency: "a"),
+            Antenna(position: Coord(2, 2), frequency: "b"),
+            Antenna(position: Coord(4, 4), frequency: "b"),
+            Antenna(position: Coord(5, 5), frequency: "c"),
+        ]))
+        expectNoDifference(Set(map.triangulatedAntinodesLocationsAndResonantHarmonics()), Set([
+            // Original antenna positions for "a"
+            Coord(1, 1),
+            Coord(3, 3),
+            // Original antenna positions for "b"
+            Coord(2, 2),
+            Coord(4, 4),
+            // Antinodes and resonant harmonics for "a"
+            Coord(5, 5),
+            Coord(7, 7),
+            Coord(9, 9),
+            // Antinodes and resonant harmonics for "b"
+            Coord(0, 0),
+            Coord(6, 6),
+            Coord(8, 8),
+        ]))
+
+        let mapWithNoAntinodePairs = try #require(Map(width: 10, height: 10, antennas: [
+            Antenna(position: Coord(1, 1), frequency: "a"),
+            Antenna(position: Coord(2, 2), frequency: "b"),
+        ]))
+
+        expectNoDifference(Set(mapWithNoAntinodePairs.triangulatedAntinodesLocationsAndResonantHarmonics()), Set([]))
+
+        let mapWithDuplicatedAntinodes = try #require(Map(width: 10, height: 10, antennas: [
+            Antenna(position: Coord(3, 1), frequency: "a"),
+            Antenna(position: Coord(2, 2), frequency: "a"),
+            Antenna(position: Coord(3, 0), frequency: "b"),
+            Antenna(position: Coord(2, 0), frequency: "b"),
+        ]))
+
+        let antinodes = mapWithDuplicatedAntinodes.triangulatedAntinodesLocationsAndResonantHarmonics()
+        expectNoDifference(Set(antinodes), Set([
+            // Original antenna positions
+            Coord(3, 1),
+            Coord(2, 2),
+            Coord(3, 0),
+            Coord(2, 0),
+            // Antinodes and resonant harmonics of "a"
+            Coord(1, 3),
+            Coord(0, 4),
+            // Antinodes and resonant harmonics of "b"
+            Coord(0, 0),
+            Coord(1, 0),
+            Coord(5, 0),
+            Coord(6, 0),
+            Coord(7, 0),
+            Coord(8, 0),
+            Coord(9, 0),
+            // Antinodes and resonant harmonics of "a" and "b"
+            Coord(4, 0),
+        ]))
+        #expect(antinodes.count == 14)
+    }
+
+    @Test("Part2 with challenge example input")
+    func exampleInputPart2() throws {
+        let part2 = try Day8().runPart2(with: inputPart)
+        #expect(part2 == "34")
     }
 }

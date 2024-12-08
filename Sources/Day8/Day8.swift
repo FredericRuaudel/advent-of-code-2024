@@ -11,8 +11,10 @@ public struct Day8: AoCDay {
         return antinodes.count.asText()
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        let map = try scanningAreaForAntennas(using: input)
+        let antinodes = map.triangulatedAntinodesLocationsAndResonantHarmonics()
+        return antinodes.count.asText()
     }
 
     func scanningAreaForAntennas(using input: String) throws -> Map {
@@ -67,6 +69,21 @@ struct Map: Equatable {
             .uniqued()
         )
     }
+
+    func triangulatedAntinodesLocationsAndResonantHarmonics() -> [Coord] {
+        Array(
+            antennaPositionsByFrequencies.values.reduce(into: []) { antinodeAndResonantHarmonics, antennaPositions in
+                let allPairsOfAntennas = antennaPositions.allCombinationOfPairs()
+                antinodeAndResonantHarmonics += allPairsOfAntennas.flatMap {
+                    $0.antinodeAndResonantHarmonicsBeforeAndWithinArea(ofWidth: width, height: height)
+                }
+                antinodeAndResonantHarmonics += allPairsOfAntennas.flatMap {
+                    $0.antinodeAndResonantHarmonicsAfterAndWithinArea(ofWidth: width, height: height)
+                }
+            }
+            .uniqued()
+        )
+    }
 }
 
 struct Antenna: Equatable {
@@ -75,10 +92,40 @@ struct Antenna: Equatable {
 }
 
 extension Pair where A == Coord, B == Coord {
+    func antinodeBefore() -> Coord {
+        Coord(first.x + (first.x - second.x), first.y + (first.y - second.y))
+    }
+
+    func antinodeAndResonantHarmonicsBeforeAndWithinArea(ofWidth width: Int, height: Int) -> [Coord] {
+        var antinodeAndResonantHarmonics = [Coord]()
+        var currentPair = self
+        while currentPair.first.isInsideArea(width: width, height: height) {
+            antinodeAndResonantHarmonics.append(currentPair.first)
+            let previousAntinode = currentPair.antinodeBefore()
+            currentPair = Pair(previousAntinode, currentPair.first)
+        }
+        return antinodeAndResonantHarmonics
+    }
+
+    func antinodeAfter() -> Coord {
+        Coord(second.x + (second.x - first.x), second.y + (second.y - first.y))
+    }
+
+    func antinodeAndResonantHarmonicsAfterAndWithinArea(ofWidth width: Int, height: Int) -> [Coord] {
+        var antinodeAndResonantHarmonics = [Coord]()
+        var currentPair = self
+        while currentPair.second.isInsideArea(width: width, height: height) {
+            antinodeAndResonantHarmonics.append(currentPair.second)
+            let nextAntinode = currentPair.antinodeAfter()
+            currentPair = Pair(currentPair.second, nextAntinode)
+        }
+        return antinodeAndResonantHarmonics
+    }
+
     func pairOfAntinodes() -> Self {
         Pair(
-            Coord(first.x + (first.x - second.x), first.y + (first.y - second.y)),
-            Coord(second.x + (second.x - first.x), second.y + (second.y - first.y))
+            antinodeBefore(),
+            antinodeAfter()
         )
     }
 }
