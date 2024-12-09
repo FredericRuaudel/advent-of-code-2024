@@ -2,7 +2,7 @@ import Core
 import OrderedCollections
 import Parsing
 
-public struct Day5: AoCDay {
+public class Day5: AoCDay {
     public init() {}
 
     struct Day5Error: Error {}

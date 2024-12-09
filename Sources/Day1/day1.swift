@@ -1,7 +1,7 @@
 import Core
 import Parsing
 
-public struct Day1: AoCDay {
+public class Day1: AoCDay {
     public init() {}
 
     public func runPart1(with input: String) throws -> String {

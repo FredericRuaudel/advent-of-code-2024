@@ -1,6 +1,6 @@
 import Core
 
-public struct Day6: AoCDay {
+public class Day6: AoCDay {
     public init() {}
 
     public func runPart1(with input: String) throws -> String {
