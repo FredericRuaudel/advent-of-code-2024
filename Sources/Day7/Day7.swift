@@ -1,8 +1,8 @@
 import Core
 import Parsing
 
-public class Day7: AoCDay {
-    public init() {}
+public final class Day7: AoCDay {
+    public required init() {}
 
     public func runPart1(with input: String) throws -> String {
         let validCalibrations = try validCalibrations(for: Set([.add, .multiply]), using: input)

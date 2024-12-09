@@ -1,8 +1,8 @@
 import Core
 import Parsing
 
-public class Day1: AoCDay {
-    public init() {}
+public final class Day1: AoCDay {
+    public required init() {}
 
     public func runPart1(with input: String) throws -> String {
         var (leftLocationIds, rightLocationIds) = try parse(input)

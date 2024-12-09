@@ -2,8 +2,8 @@ import Core
 import OrderedCollections
 import Parsing
 
-public class Day5: AoCDay {
-    public init() {}
+public final class Day5: AoCDay {
+    public required init() {}
 
     struct Day5Error: Error {}
 

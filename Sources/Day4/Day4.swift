@@ -1,8 +1,8 @@
 import Core
 import Foundation
 
-public class Day4: AoCDay {
-    public init() {}
+public final class Day4: AoCDay {
+    public required init() {}
 
     public func runPart1(with input: String) throws -> String {
         let letterGrid = input.toCharacterGrid()
