@@ -5,30 +5,42 @@ import Testing
 struct Day9Tests {
     let inputPart = "2333133121414131402"
 
-    @Test("A FileChunk should have an id property set via init")
-    func fileChunkIdPropertyTest() {
-        let chunk1 = FileChunk(id: 1)
-        #expect(chunk1.id == 1)
+    @Test("A DiskChunk should have a file case with an id property set via init")
+    func diskChunkFileCaseTest() {
+        let chunk1 = DiskChunk.file(id: 1)
+        if case let .file(id) = chunk1 {
+            #expect(id == 1)
+        } else {
+            Issue.record("chunk1 should be a file")
+        }
 
-        let chunk2 = FileChunk(id: 42)
-        #expect(chunk2.id == 42)
+        let chunk2 = DiskChunk.file(id: 42)
+        if case let .file(id) = chunk2 {
+            #expect(id == 42)
+        } else {
+            Issue.record("chunk2 should be a file")
+        }
 
-        let chunk3 = FileChunk(id: 0)
-        #expect(chunk3.id == 0)
+        let chunk3 = DiskChunk.file(id: 0)
+        if case let .file(id) = chunk3 {
+            #expect(id == 0)
+        } else {
+            Issue.record("chunk3 should be a file")
+        }
     }
 
-    @Test("A CleanDisk should have a chunks property of type [FileChunk] initialized as empty")
+    @Test("A CleanDisk should have a chunks property of type [DiskChunk] initialized as empty")
     func cleanDiskChunksPropertyTest() {
         let disk = CleanDisk()
         expectNoDifference(disk.chunks, [])
     }
 
-    @Test("A CleanDisk should have an appendChunk method that appends a FileChunk to its chunks property")
+    @Test("A CleanDisk should have an appendChunk method that appends a DiskChunk to its chunks property")
     func cleanDiskAppendChunkTest() {
         var disk = CleanDisk()
-        let chunk1 = FileChunk(id: 1)
-        let chunk2 = FileChunk(id: 2)
-        let chunk3 = FileChunk(id: 3)
+        let chunk1 = DiskChunk.file(id: 1)
+        let chunk2 = DiskChunk.file(id: 2)
+        let chunk3 = DiskChunk.file(id: 3)
 
         disk.appendChunk(chunk1)
         expectNoDifference(disk.chunks, [chunk1])
@@ -40,10 +52,10 @@ struct Day9Tests {
         expectNoDifference(disk.chunks, [chunk1, chunk2, chunk3])
     }
 
-    @Test("A CleanDisk should have an append method that appends a FileChunk n times to its chunks property")
+    @Test("A CleanDisk should have an append method that appends a DiskChunk n times to its chunks property")
     func cleanDiskAppendNTimesTest() {
         var disk = CleanDisk()
-        let chunk = FileChunk(id: 42)
+        let chunk = DiskChunk.file(id: 42)
 
         disk.append(0, chunk: chunk)
         expectNoDifference(disk.chunks, [])
@@ -54,24 +66,24 @@ struct Day9Tests {
         disk.append(3, chunk: chunk)
         expectNoDifference(disk.chunks, [chunk, chunk, chunk, chunk])
 
-        let chunk2 = FileChunk(id: 7)
+        let chunk2 = DiskChunk.file(id: 7)
         disk.append(2, chunk: chunk2)
         expectNoDifference(disk.chunks, [chunk, chunk, chunk, chunk, chunk2, chunk2])
     }
 
-    @Test("A CleanDisk should have an appendChunks method that appends multiple FileChunks at once")
+    @Test("A CleanDisk should have an appendChunks method that appends multiple DiskChunks at once")
     func cleanDiskAppendChunksTest() {
         var disk = CleanDisk()
-        let chunk1 = FileChunk(id: 1)
-        let chunk2 = FileChunk(id: 2)
-        let chunk3 = FileChunk(id: 3)
+        let chunk1 = DiskChunk.file(id: 1)
+        let chunk2 = DiskChunk.file(id: 2)
+        let chunk3 = DiskChunk.file(id: 3)
         let chunks = [chunk1, chunk2, chunk3]
 
         disk.appendChunks(chunks)
         expectNoDifference(disk.chunks, chunks)
 
-        let chunk4 = FileChunk(id: 4)
-        let chunk5 = FileChunk(id: 5)
+        let chunk4 = DiskChunk.file(id: 4)
+        let chunk5 = DiskChunk.file(id: 5)
         let moreChunks = [chunk4, chunk5]
 
         disk.appendChunks(moreChunks)
@@ -81,12 +93,12 @@ struct Day9Tests {
         expectNoDifference(disk.chunks, chunks + moreChunks)
     }
 
-    @Test("A CleanDisk should have a checksum method that returns the sum of each chunk index multiplied by its FileChunk id")
+    @Test("A CleanDisk should have a checksum method that returns the sum of each chunk index multiplied by its DiskChunk id")
     func cleanDiskChecksumTest() {
         var disk = CleanDisk()
-        let chunk1 = FileChunk(id: 1)
-        let chunk2 = FileChunk(id: 2)
-        let chunk3 = FileChunk(id: 3)
+        let chunk1 = DiskChunk.file(id: 1)
+        let chunk2 = DiskChunk.file(id: 2)
+        let chunk3 = DiskChunk.file(id: 3)
 
         disk.appendChunk(chunk1)
         #expect(disk.checksum() == 0) // 0 * 1 (index 0 * id 1)
@@ -300,10 +312,10 @@ struct Day9Tests {
         try fragmentedDisk.writeFile(ofSize: 5)
 
         var expectedCleanDisk = CleanDisk()
-        expectedCleanDisk.appendChunk(FileChunk(id: 0))
-        expectedCleanDisk.append(2, chunk: FileChunk(id: 2))
-        expectedCleanDisk.append(3, chunk: FileChunk(id: 1))
-        expectedCleanDisk.append(3, chunk: FileChunk(id: 2))
+        expectedCleanDisk.appendChunk(DiskChunk.file(id: 0))
+        expectedCleanDisk.append(2, chunk: DiskChunk.file(id: 2))
+        expectedCleanDisk.append(3, chunk: DiskChunk.file(id: 1))
+        expectedCleanDisk.append(3, chunk: DiskChunk.file(id: 2))
 
         expectNoDifference(fragmentedDisk.defrag(), expectedCleanDisk)
     }
