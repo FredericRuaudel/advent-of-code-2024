@@ -7,6 +7,7 @@ import Day5
 import Day6
 import Day7
 import Day8
+import Day9
 import Foundation
 
 print("Hello, Advent Of Code!")
@@ -18,3 +19,4 @@ try AoC24.run(day: 5, using: Day5.self)
 // try AoC24.run(day: 6, using: Day6.self)
 // try AoC24.run(day: 7, using: Day7.self)
 try AoC24.run(day: 8, using: Day8.self)
+try AoC24.run(day: 9, using: Day9.self)
