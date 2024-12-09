@@ -326,6 +326,24 @@ struct Day9Tests {
         #expect(part1 == "1928")
     }
 
+    @Test("DiskChunk should have a computed property checksum that returns the file id")
+    func diskChunkChecksumTest() {
+        let chunk1 = DiskChunk.file(id: 42)
+        #expect(chunk1.checksum == 42)
+
+        let chunk2 = DiskChunk.file(id: 0)
+        #expect(chunk2.checksum == 0)
+
+        let chunk3 = DiskChunk.file(id: 100)
+        #expect(chunk3.checksum == 100)
+    }
+
+    @Test("DiskChunk should have a free case for which checksum returns 0")
+    func diskChunkFreeCaseTest() {
+        let chunk = DiskChunk.free
+        #expect(chunk.checksum == 0)
+    }
+
     @Test("Part2 with challenge example input")
     func exampleInputPart2() throws {
         let part2 = try Day9().runPart2(with: inputPart)
