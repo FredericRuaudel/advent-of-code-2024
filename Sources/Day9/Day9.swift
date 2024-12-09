@@ -10,8 +10,10 @@ public struct Day9: AoCDay {
         return cleanedDisk.checksum().asText()
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        let fragmentedDisk = try readFragmentedDisk(from: input)
+        let cleanedDisk = fragmentedDisk.wholeFileDefrag()
+        return cleanedDisk.checksum().asText()
     }
 
     func readFragmentedDisk(from input: String) throws -> FragmentedDisk {
@@ -73,6 +75,66 @@ struct FragmentedDisk: Equatable {
             }
         }
         return resultDisk
+    }
+
+    func wholeFileDefrag() -> CleanDisk {
+        let allFilesFromEndOfDisk = content.reversed().compactMap { $0[case: \.file] }
+        var newContent = content
+        for file in allFilesFromEndOfDisk {
+            newContent = newContent.moveInFirstFittingFreeSpaceIfAvailable(file: file)
+            newContent = newContent.coalesceAllFreeSpaces()
+        }
+        return newContent.reduce(into: CleanDisk()) { resultDisk, diskSpace in
+            switch diskSpace {
+            case let .file(file):
+                resultDisk.append(file.size, chunk: .file(id: file.id))
+            case let .freeSpace(size):
+                resultDisk.append(size, chunk: .free)
+            }
+        }
+    }
+}
+
+extension Array where Element == DiskSpace {
+    func moveInFirstFittingFreeSpaceIfAvailable(file: File) -> Self {
+        var newContent = self
+        let firstFittingFreeSpaceIndex = newContent.firstIndex(where: { diskSpace in
+            diskSpace.is(\.freeSpace) && diskSpace.size >= file.size
+        })
+        if let firstFittingFreeSpaceIndex {
+            let removedSpace = newContent.remove(at: firstFittingFreeSpaceIndex)
+            var insertedDiskSpaces = [DiskSpace.file(file)]
+            if removedSpace.size > file.size {
+                insertedDiskSpaces.append(.freeSpace(size: removedSpace.size - file.size))
+            }
+            newContent.insert(contentsOf: insertedDiskSpaces, at: firstFittingFreeSpaceIndex)
+            if let lastIndexOfFile = newContent.lastIndex(of: .file(file)) {
+                newContent.remove(at: lastIndexOfFile)
+                newContent.insert(.freeSpace(size: file.size), at: lastIndexOfFile)
+            }
+        }
+        return newContent
+    }
+
+    func coalesceAllFreeSpaces() -> Self {
+        var newContent = Self()
+        var contiguousFreeSpacesSize: UInt = 0
+        for diskSpace in self {
+            switch diskSpace {
+            case .file:
+                if contiguousFreeSpacesSize > 0 {
+                    newContent.append(.freeSpace(size: contiguousFreeSpacesSize))
+                    contiguousFreeSpacesSize = 0
+                }
+                newContent.append(diskSpace)
+            case let .freeSpace(size):
+                contiguousFreeSpacesSize += size
+            }
+        }
+        if contiguousFreeSpacesSize > 0 {
+            newContent.append(.freeSpace(size: contiguousFreeSpacesSize))
+        }
+        return newContent
     }
 }
 

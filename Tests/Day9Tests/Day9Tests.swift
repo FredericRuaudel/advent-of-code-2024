@@ -344,9 +344,180 @@ struct Day9Tests {
         #expect(chunk.checksum == 0)
     }
 
+    @Test("Array should have a method removeLastOccurrence that removes and returns only the last element equal to the given one")
+    func removeLastOccurrenceTest() {
+        var array = [1, 2, 3, 2, 4, 2, 5]
+        let removed = array.removeLastOccurrence(of: 2)
+
+        #expect(removed == 2)
+        #expect(array == [1, 2, 3, 2, 4, 5])
+
+        let removed2 = array.removeLastOccurrence(of: 2)
+        #expect(removed2 == 2)
+        #expect(array == [1, 2, 3, 4, 5])
+
+        let removed3 = array.removeLastOccurrence(of: 2)
+        #expect(removed3 == 2)
+        #expect(array == [1, 3, 4, 5])
+
+        let removed4 = array.removeLastOccurrence(of: 2)
+        #expect(removed4 == nil)
+        #expect(array == [1, 3, 4, 5])
+    }
+
+    @Test("Array of DiskSpace should have a method moveInFirstFittingFreeSpaceIfAvailable that moves a file to first fitting free space")
+    func moveInFirstFittingFreeSpaceTest() {
+        let diskSpaces: [DiskSpace] = [
+            .file(File(id: 0, size: 2)),
+            .freeSpace(size: 4),
+            .file(File(id: 1, size: 3)),
+            .freeSpace(size: 2),
+            .file(File(id: 2, size: 2)),
+        ]
+
+        let file = File(id: 2, size: 2)
+        let result = diskSpaces.moveInFirstFittingFreeSpaceIfAvailable(file: file)
+
+        let expected: [DiskSpace] = [
+            .file(File(id: 0, size: 2)),
+            .file(File(id: 2, size: 2)),
+            .freeSpace(size: 2),
+            .file(File(id: 1, size: 3)),
+            .freeSpace(size: 2),
+            .freeSpace(size: 2),
+        ]
+
+        expectNoDifference(result, expected)
+
+        // Test when free space is exactly file size
+        let diskSpaces2: [DiskSpace] = [
+            .file(File(id: 0, size: 2)),
+            .freeSpace(size: 3),
+            .file(File(id: 1, size: 3)),
+            .file(File(id: 2, size: 3)),
+        ]
+
+        let file2 = File(id: 2, size: 3)
+        let result2 = diskSpaces2.moveInFirstFittingFreeSpaceIfAvailable(file: file2)
+
+        let expected2: [DiskSpace] = [
+            .file(File(id: 0, size: 2)),
+            .file(File(id: 2, size: 3)),
+            .file(File(id: 1, size: 3)),
+            .freeSpace(size: 3),
+        ]
+
+        expectNoDifference(result2, expected2)
+
+        // Test when no fitting free space available
+        let diskSpaces3: [DiskSpace] = [
+            .file(File(id: 0, size: 2)),
+            .freeSpace(size: 1),
+            .file(File(id: 1, size: 3)),
+            .file(File(id: 2, size: 3)),
+        ]
+
+        let file3 = File(id: 2, size: 3)
+        let result3 = diskSpaces3.moveInFirstFittingFreeSpaceIfAvailable(file: file3)
+
+        expectNoDifference(result3, diskSpaces3)
+    }
+    @Test("Array<DiskSpace>.coalesceAllFreeSpaces() should combine contiguous free spaces")
+    func coalesceAllFreeSpacesTest() {
+        let diskSpaces: [DiskSpace] = [
+            .file(File(id: 0, size: 2)),
+            .freeSpace(size: 3),
+            .freeSpace(size: 2),
+            .file(File(id: 1, size: 3)),
+            .freeSpace(size: 1),
+            .freeSpace(size: 2),
+            .freeSpace(size: 3),
+            .file(File(id: 2, size: 2))
+        ]
+
+        let result = diskSpaces.coalesceAllFreeSpaces()
+
+        let expected: [DiskSpace] = [
+            .file(File(id: 0, size: 2)),
+            .freeSpace(size: 5),
+            .file(File(id: 1, size: 3)),
+            .freeSpace(size: 6),
+            .file(File(id: 2, size: 2))
+        ]
+
+        expectNoDifference(result, expected)
+
+        // Test with no contiguous free spaces
+        let diskSpaces2: [DiskSpace] = [
+            .file(File(id: 0, size: 2)),
+            .freeSpace(size: 3),
+            .file(File(id: 1, size: 3)),
+            .freeSpace(size: 2),
+            .file(File(id: 2, size: 2))
+        ]
+
+        let result2 = diskSpaces2.coalesceAllFreeSpaces()
+        expectNoDifference(result2, diskSpaces2)
+
+        // Test with only free spaces
+        let diskSpaces3: [DiskSpace] = [
+            .freeSpace(size: 1),
+            .freeSpace(size: 2),
+            .freeSpace(size: 3)
+        ]
+
+        let result3 = diskSpaces3.coalesceAllFreeSpaces()
+        let expected3: [DiskSpace] = [.freeSpace(size: 6)]
+
+        expectNoDifference(result3, expected3)
+    }
+
+    @Test("FragmentedDisk.wholeFileDefrag should return a CleanDisk where all the gaps are filled with FileChunks of whole files from the end of the fragmented disk when possible")
+    func wholeFileDefragTest() throws {
+        var fragmentedDisk = FragmentedDisk()
+        try fragmentedDisk.writeFile(ofSize: 2)
+        try fragmentedDisk.moveFilePointer(by: 3)
+        try fragmentedDisk.writeFile(ofSize: 3)
+        try fragmentedDisk.moveFilePointer(by: 3)
+        try fragmentedDisk.writeFile(ofSize: 1)
+        try fragmentedDisk.moveFilePointer(by: 3)
+        try fragmentedDisk.writeFile(ofSize: 3)
+        try fragmentedDisk.moveFilePointer(by: 1)
+        try fragmentedDisk.writeFile(ofSize: 2)
+        try fragmentedDisk.moveFilePointer(by: 1)
+        try fragmentedDisk.writeFile(ofSize: 4)
+        try fragmentedDisk.moveFilePointer(by: 1)
+        try fragmentedDisk.writeFile(ofSize: 4)
+        try fragmentedDisk.moveFilePointer(by: 1)
+        try fragmentedDisk.writeFile(ofSize: 3)
+        try fragmentedDisk.moveFilePointer(by: 1)
+        try fragmentedDisk.writeFile(ofSize: 4)
+        try fragmentedDisk.writeFile(ofSize: 2)
+
+        var expectedCleanDisk = CleanDisk()
+        expectedCleanDisk.append(2, chunk: .file(id: 0))
+        expectedCleanDisk.append(2, chunk: .file(id: 9))
+        expectedCleanDisk.append(1, chunk: .file(id: 2))
+        expectedCleanDisk.append(3, chunk: .file(id: 1))
+        expectedCleanDisk.append(3, chunk: .file(id: 7))
+        expectedCleanDisk.appendChunk(.free)
+        expectedCleanDisk.append(2, chunk: .file(id: 4))
+        expectedCleanDisk.appendChunk(.free)
+        expectedCleanDisk.append(3, chunk: .file(id: 3))
+        expectedCleanDisk.append(4, chunk: .free)
+        expectedCleanDisk.append(4, chunk: .file(id: 5))
+        expectedCleanDisk.appendChunk(.free)
+        expectedCleanDisk.append(4, chunk: .file(id: 6))
+        expectedCleanDisk.append(5, chunk: .free)
+        expectedCleanDisk.append(4, chunk: .file(id: 8))
+        expectedCleanDisk.append(2, chunk: .free)
+
+        expectNoDifference(fragmentedDisk.wholeFileDefrag(), expectedCleanDisk)
+    }
+
     @Test("Part2 with challenge example input")
     func exampleInputPart2() throws {
         let part2 = try Day9().runPart2(with: inputPart)
-        #expect(part2 == "")
+        #expect(part2 == "2858")
     }
 }
