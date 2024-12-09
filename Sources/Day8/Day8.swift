@@ -2,7 +2,7 @@ import Algorithms
 import Core
 import IssueReporting
 
-public struct Day8: AoCDay {
+public class Day8: AoCDay {
     public init() {}
 
     public func runPart1(with input: String) throws -> String {

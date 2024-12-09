@@ -1,7 +1,7 @@
 import Core
 import Foundation
 
-public struct Day4: AoCDay {
+public class Day4: AoCDay {
     public init() {}
 
     public func runPart1(with input: String) throws -> String {
