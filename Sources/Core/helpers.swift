@@ -44,3 +44,11 @@ public struct Coord: Equatable, Hashable {
             x < width && y < height
     }
 }
+
+public extension Array where Element: Equatable {
+    @discardableResult
+    mutating func removeLastOccurrence(of element: Element) -> Element? {
+        guard let lastIndex = lastIndex(of: element) else { return nil }
+        return remove(at: lastIndex)
+    }
+}
