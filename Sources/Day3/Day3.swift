@@ -2,8 +2,8 @@ import Core
 import IssueReporting
 import Parsing
 
-public class Day3: AoCDay {
-    public init() {}
+public final class Day3: AoCDay {
+    public required init() {}
 
     public func runPart1(with input: String) throws -> String {
         let mulList = try allMulParser.parse(input)

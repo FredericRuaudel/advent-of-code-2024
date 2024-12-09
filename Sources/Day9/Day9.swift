@@ -1,8 +1,8 @@
 import CasePaths
 import Core
 
-public class Day9: AoCDay {
-    public init() {}
+public final class Day9: AoCDay {
+    public required init() {}
 
     public func runPart1(with input: String) throws -> String {
         let fragmentedDisk = try readFragmentedDisk(from: input)
@@ -37,7 +37,7 @@ enum Day9Error: Error, Equatable {
     case writeOffsetTooLarge
 }
 
-class FragmentedDisk: Equatable {
+struct FragmentedDisk: Equatable {
     private(set) var content: [DiskSpace] = []
     private var lastId: UInt = 0
 

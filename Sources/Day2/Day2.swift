@@ -1,8 +1,8 @@
 import Core
 import Parsing
 
-public class Day2: AoCDay {
-    public init() {}
+public final class Day2: AoCDay {
+    public required init() {}
 
     public func runPart1(with input: String) throws -> String {
         let allValidReports = try AllValidReportParser().parse(input).compactMap { $0 }

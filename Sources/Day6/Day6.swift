@@ -1,7 +1,7 @@
 import Core
 
-public class Day6: AoCDay {
-    public init() {}
+public final class Day6: AoCDay {
+    public required init() {}
 
     public func runPart1(with input: String) throws -> String {
         let lab = try reconLab(from: input)

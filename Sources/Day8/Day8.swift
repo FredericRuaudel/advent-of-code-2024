@@ -2,8 +2,8 @@ import Algorithms
 import Core
 import IssueReporting
 
-public class Day8: AoCDay {
-    public init() {}
+public final class Day8: AoCDay {
+    public required init() {}
 
     public func runPart1(with input: String) throws -> String {
         let map = try scanningAreaForAntennas(using: input)
