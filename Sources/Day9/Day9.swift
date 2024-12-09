@@ -98,6 +98,16 @@ struct File: Identifiable, Equatable {
 
 enum DiskChunk: Equatable {
     case file(id: UInt)
+    case free
+
+    var checksum: Int {
+        switch self {
+        case let .file(id):
+            Int(id)
+        case .free:
+            0
+        }
+    }
 }
 
 struct CleanDisk: Equatable {
@@ -106,9 +116,7 @@ struct CleanDisk: Equatable {
     func checksum() -> Int {
         chunks.enumerated().reduce(into: 0) { sum, element in
             let (index, chunk) = element
-            if case let .file(id) = chunk {
-                sum += index * Int(id)
-            }
+            sum += index * chunk.checksum
         }
     }
 
