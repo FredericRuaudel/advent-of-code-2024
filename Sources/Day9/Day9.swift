@@ -57,7 +57,7 @@ struct FragmentedDisk: Equatable {
         var resultDisk = CleanDisk()
         var allChunks = content.flatMap { diskSpace in
             if let file = diskSpace[case: \.file] {
-                return Array(repeating: FileChunk(id: file.id), count: Int(file.size))
+                return Array(repeating: DiskChunk.file(id: file.id), count: Int(file.size))
             }
             return []
         }
@@ -96,29 +96,31 @@ struct File: Identifiable, Equatable {
     let size: UInt
 }
 
+enum DiskChunk: Equatable {
+    case file(id: UInt)
+}
+
 struct CleanDisk: Equatable {
-    private(set) var chunks: [FileChunk] = []
+    private(set) var chunks: [DiskChunk] = []
 
     func checksum() -> Int {
         chunks.enumerated().reduce(into: 0) { sum, element in
             let (index, chunk) = element
-            sum += index * Int(chunk.id)
+            if case let .file(id) = chunk {
+                sum += index * Int(id)
+            }
         }
     }
 
-    mutating func appendChunk(_ chunk: FileChunk) {
+    mutating func appendChunk(_ chunk: DiskChunk) {
         chunks.append(chunk)
     }
 
-    mutating func append(_ count: UInt, chunk: FileChunk) {
+    mutating func append(_ count: UInt, chunk: DiskChunk) {
         appendChunks(Array(repeating: chunk, count: Int(count)))
     }
 
-    mutating func appendChunks(_ chunks: [FileChunk]) {
+    mutating func appendChunks(_ chunks: [DiskChunk]) {
         self.chunks += chunks
     }
-}
-
-struct FileChunk: Identifiable, Equatable {
-    let id: UInt
 }
