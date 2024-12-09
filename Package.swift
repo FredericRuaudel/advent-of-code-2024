@@ -5,6 +5,7 @@
 
 enum Dependency {
     static let algorithms: Target.Dependency = .product(name: "Algorithms", package: "swift-algorithms")
+    static let casePaths: Target.Dependency = .product(name: "CasePaths", package: "swift-case-paths")
     static let customDump: Target.Dependency = .product(name: "CustomDump", package: "swift-custom-dump")
     static let issueReporting: Target.Dependency = .product(name: "IssueReporting", package: "xctest-dynamic-overlay")
     static let orderedCollections: Target.Dependency = .product(
@@ -32,6 +33,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-algorithms", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.1.4"),
+        .package(url: "https://github.com/pointfreeco/swift-case-paths", from: "1.5.6"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
         .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
         .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.4.3"),
@@ -156,6 +158,7 @@ let package = Package(
         ),
         .target(name: "Day9", dependencies: [
             "Core",
+            Dependency.casePaths,
         ]),
         .testTarget(
             name: "Day9Tests",
