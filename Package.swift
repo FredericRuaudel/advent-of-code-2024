@@ -29,6 +29,7 @@ let package = Package(
         .library(name: "Day7", targets: ["Day7"]),
         .library(name: "Day8", targets: ["Day8"]),
         .library(name: "Day9", targets: ["Day9"]),
+        .library(name: "Day10", targets: ["Day10"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-algorithms", from: "1.2.0"),
@@ -52,6 +53,7 @@ let package = Package(
                 "Day7",
                 "Day8",
                 "Day9",
+                "Day10",
             ]
         ),
         .target(name: "Core"),
@@ -165,6 +167,17 @@ let package = Package(
             dependencies: [
                 "Core",
                 "Day9",
+                Dependency.customDump,
+            ]
+        ),
+        .target(name: "Day10", dependencies: [
+            "Core",
+        ]),
+        .testTarget(
+            name: "Day10Tests",
+            dependencies: [
+                "Core",
+                "Day10",
                 Dependency.customDump,
             ]
         ),
