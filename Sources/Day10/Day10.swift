@@ -12,8 +12,12 @@ public final class Day10: AoCDay {
         }.sum().asText()
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        let topographicMap = try readMap(from: input)
+        let allTrailheads = topographicMap.findTrailheads()
+        return allTrailheads.map { trailhead in
+            trailhead.evaluateTrailRating(on: topographicMap)
+        }.sum().asText()
     }
 
     private func readMap(from input: String) throws -> TopographicMap {
@@ -90,14 +94,28 @@ struct Trailhead: Equatable, Hashable {
         var validNextSteps = [position].uniqued()
         var nextElevation: UInt = 1
         while nextElevation < 10 {
-            validNextSteps = validNextStepPositions(validNextSteps, atElevation: nextElevation, on: topoMap)
+            validNextSteps = validNextStepUniquePositions(validNextSteps, atElevation: nextElevation, on: topoMap)
             nextElevation += 1
         }
         return UInt(Array(validNextSteps).count)
     }
 
-    private func validNextStepPositions(_ positions: UniquedSequence<[Coord], Coord>, atElevation elevation: UInt, on topoMap: TopographicMap) -> UniquedSequence<[Coord], Coord> {
+    private func validNextStepUniquePositions(_ positions: UniquedSequence<[Coord], Coord>, atElevation elevation: UInt, on topoMap: TopographicMap) -> UniquedSequence<[Coord], Coord> {
         positions.flatMap { topoMap.pointPositions(around: $0, atElevation: elevation) }.uniqued()
+    }
+
+    func evaluateTrailRating(on topoMap: TopographicMap) -> UInt {
+        var validNextSteps = [position]
+        var nextElevation: UInt = 1
+        while nextElevation < 10 {
+            validNextSteps = validNextStepPositions(validNextSteps, atElevation: nextElevation, on: topoMap)
+            nextElevation += 1
+        }
+        return UInt(validNextSteps.count)
+    }
+
+    private func validNextStepPositions(_ positions: [Coord], atElevation elevation: UInt, on topoMap: TopographicMap) -> [Coord] {
+        positions.flatMap { topoMap.pointPositions(around: $0, atElevation: elevation) }
     }
 }
 
