@@ -200,7 +200,7 @@ struct Day10Tests {
         #expect(Set(moreAdjacentPoints) == Set(moreExpectedPoints))
     }
 
-    @Test("Trailhead should evaluate all possible paths from elevation 0 to 9 on map")
+    @Test("Trailhead should evaluate all possible paths from elevation 0 to 9 on map, counting the unique number of summit that can be reached")
     func trailheadEvaluateTrailTest() throws {
         let points = try [
             [
@@ -297,9 +297,100 @@ struct Day10Tests {
         #expect(part1 == "36")
     }
 
+    @Test("Trailhead should evaluate all possible paths from elevation 0 to 9 on map counting each possible trail to reach each summit")
+    func trailheadEvaluateTrailRatingTest() throws {
+        let points = try [
+            [
+                #require(TopographicPoint(position: Coord(0, 0), elevation: 9)),
+                #require(TopographicPoint(position: Coord(1, 0), elevation: 9)),
+                #require(TopographicPoint(position: Coord(2, 0), elevation: 9)),
+                #require(TopographicPoint(position: Coord(3, 0), elevation: 0)),
+                #require(TopographicPoint(position: Coord(4, 0), elevation: 9)),
+                #require(TopographicPoint(position: Coord(5, 0), elevation: 9)),
+                #require(TopographicPoint(position: Coord(6, 0), elevation: 9)),
+            ],
+            [
+                #require(TopographicPoint(position: Coord(0, 1), elevation: 7)),
+                #require(TopographicPoint(position: Coord(1, 1), elevation: 7)),
+                #require(TopographicPoint(position: Coord(2, 1), elevation: 7)),
+                #require(TopographicPoint(position: Coord(3, 1), elevation: 1)),
+                #require(TopographicPoint(position: Coord(4, 1), elevation: 7)),
+                #require(TopographicPoint(position: Coord(5, 1), elevation: 7)),
+                #require(TopographicPoint(position: Coord(6, 1), elevation: 7)),
+            ],
+            [
+                #require(TopographicPoint(position: Coord(0, 2), elevation: 8)),
+                #require(TopographicPoint(position: Coord(1, 2), elevation: 8)),
+                #require(TopographicPoint(position: Coord(2, 2), elevation: 8)),
+                #require(TopographicPoint(position: Coord(3, 2), elevation: 2)),
+                #require(TopographicPoint(position: Coord(4, 2), elevation: 8)),
+                #require(TopographicPoint(position: Coord(5, 2), elevation: 8)),
+                #require(TopographicPoint(position: Coord(6, 2), elevation: 8)),
+            ],
+            [
+                #require(TopographicPoint(position: Coord(0, 3), elevation: 6)),
+                #require(TopographicPoint(position: Coord(1, 3), elevation: 5)),
+                #require(TopographicPoint(position: Coord(2, 3), elevation: 4)),
+                #require(TopographicPoint(position: Coord(3, 3), elevation: 3)),
+                #require(TopographicPoint(position: Coord(4, 3), elevation: 4)),
+                #require(TopographicPoint(position: Coord(5, 3), elevation: 5)),
+                #require(TopographicPoint(position: Coord(6, 3), elevation: 6)),
+            ],
+            [
+                #require(TopographicPoint(position: Coord(0, 4), elevation: 7)),
+                #require(TopographicPoint(position: Coord(1, 4), elevation: 1)),
+                #require(TopographicPoint(position: Coord(2, 4), elevation: 1)),
+                #require(TopographicPoint(position: Coord(3, 4), elevation: 4)),
+                #require(TopographicPoint(position: Coord(4, 4), elevation: 1)),
+                #require(TopographicPoint(position: Coord(5, 4), elevation: 1)),
+                #require(TopographicPoint(position: Coord(6, 4), elevation: 7)),
+            ],
+            [
+                #require(TopographicPoint(position: Coord(0, 5), elevation: 8)),
+                #require(TopographicPoint(position: Coord(1, 5), elevation: 3)),
+                #require(TopographicPoint(position: Coord(2, 5), elevation: 3)),
+                #require(TopographicPoint(position: Coord(3, 5), elevation: 5)),
+                #require(TopographicPoint(position: Coord(4, 5), elevation: 3)),
+                #require(TopographicPoint(position: Coord(5, 5), elevation: 3)),
+                #require(TopographicPoint(position: Coord(6, 5), elevation: 8)),
+            ],
+            [
+                #require(TopographicPoint(position: Coord(0, 6), elevation: 9)),
+                #require(TopographicPoint(position: Coord(1, 6), elevation: 2)),
+                #require(TopographicPoint(position: Coord(2, 6), elevation: 2)),
+                #require(TopographicPoint(position: Coord(3, 6), elevation: 6)),
+                #require(TopographicPoint(position: Coord(4, 6), elevation: 7)),
+                #require(TopographicPoint(position: Coord(5, 6), elevation: 8)),
+                #require(TopographicPoint(position: Coord(6, 6), elevation: 9)),
+            ],
+        ]
+
+        let map = try #require(TopographicMap(width: 7, height: 7, points: points))
+        let trailhead = Trailhead(position: Coord(3, 0))
+
+        #expect(trailhead.evaluateTrailRating(on: map) == 3)
+
+        // Test with a map that has no valid paths
+        let pointsWithNoPath = try [
+            [
+                #require(TopographicPoint(position: Coord(0, 0), elevation: 0)),
+                #require(TopographicPoint(position: Coord(1, 0), elevation: 1)),
+            ],
+            [
+                #require(TopographicPoint(position: Coord(0, 1), elevation: 1)),
+                #require(TopographicPoint(position: Coord(1, 1), elevation: 2)),
+            ],
+        ]
+
+        let mapWithNoPath = try #require(TopographicMap(width: 2, height: 2, points: pointsWithNoPath))
+        let trailheadWithNoPath = Trailhead(position: Coord(0, 0))
+        
+        #expect(trailheadWithNoPath.evaluateTrailRating(on: mapWithNoPath) == 0)
+    }
+
     @Test("Part2 with challenge example input")
     func exampleInputPart2() throws {
         let part2 = try Day10().runPart2(with: inputPart)
-        #expect(part2 == "")
+        #expect(part2 == "81")
     }
 }
