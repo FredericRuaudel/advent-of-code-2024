@@ -140,12 +140,7 @@ struct Guard: Equatable {
     }
 }
 
-enum Direction: Equatable, Hashable, CaseIterable {
-    case north
-    case east
-    case south
-    case west
-
+extension Direction {
     func turnRight() -> Self {
         switch self {
         case .north:
@@ -162,8 +157,8 @@ enum Direction: Equatable, Hashable, CaseIterable {
 
 extension Coord {
     func heading(_ heading: Direction) -> Self {
-        var nextX = self.x
-        var nextY = self.y
+        var nextX = x
+        var nextY = y
         switch heading {
         case .north:
             nextY -= 1

@@ -109,14 +109,14 @@ struct Day4Tests {
 
     @Test("Direction enum has an offset property that returns a Coord representing how to move in that direction")
     func directionOffsetTest() {
-        #expect(Direction.north.offset == Coord(0, -1))
-        #expect(Direction.northEast.offset == Coord(1, -1))
-        #expect(Direction.east.offset == Coord(1, 0))
-        #expect(Direction.southEast.offset == Coord(1, 1))
-        #expect(Direction.south.offset == Coord(0, 1))
-        #expect(Direction.southWest.offset == Coord(-1, 1))
-        #expect(Direction.west.offset == Coord(-1, 0))
-        #expect(Direction.northWest.offset == Coord(-1, -1))
+        #expect(CardinalDirection.north.offset == Coord(0, -1))
+        #expect(CardinalDirection.northEast.offset == Coord(1, -1))
+        #expect(CardinalDirection.east.offset == Coord(1, 0))
+        #expect(CardinalDirection.southEast.offset == Coord(1, 1))
+        #expect(CardinalDirection.south.offset == Coord(0, 1))
+        #expect(CardinalDirection.southWest.offset == Coord(-1, 1))
+        #expect(CardinalDirection.west.offset == Coord(-1, 0))
+        #expect(CardinalDirection.northWest.offset == Coord(-1, -1))
     }
 
     @Test("Adding two coordonates should add their fields")
