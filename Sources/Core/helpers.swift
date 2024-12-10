@@ -18,9 +18,21 @@ public enum AoC24 {
     }
 }
 
+public extension UInt {
+    func asText() -> String {
+        "\(self)"
+    }
+}
+
 public extension Int {
     func asText() -> String {
         "\(self)"
+    }
+}
+
+public extension Array where Element == UInt {
+    func sum() -> UInt {
+        reduce(0,+)
     }
 }
 
