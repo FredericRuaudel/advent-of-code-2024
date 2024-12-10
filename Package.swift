@@ -172,6 +172,7 @@ let package = Package(
         ),
         .target(name: "Day10", dependencies: [
             "Core",
+            Dependency.algorithms,
         ]),
         .testTarget(
             name: "Day10Tests",
