@@ -101,12 +101,6 @@ extension Array where Element == String {
     }
 }
 
-extension Coord {
-    static func + (_ lhs: Self, _ rhs: Self) -> Self {
-        Coord(lhs.x + rhs.x, lhs.y + rhs.y)
-    }
-}
-
 enum CardinalDirection: Equatable, CaseIterable {
     case north
     case northEast

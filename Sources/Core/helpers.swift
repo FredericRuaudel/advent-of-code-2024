@@ -43,6 +43,10 @@ public struct Coord: Equatable, Hashable {
         x >= 0 && y >= 0 &&
             x < width && y < height
     }
+
+    public static func + (_ lhs: Self, _ rhs: Self) -> Self {
+        Coord(lhs.x + rhs.x, lhs.y + rhs.y)
+    }
 }
 
 public enum Direction: Equatable, CaseIterable {
