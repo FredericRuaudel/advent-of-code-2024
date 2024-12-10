@@ -18,12 +18,12 @@ public final class Day6: AoCDay {
 
     func reconLab(from input: String) throws -> Lab {
         let lines = input.split(separator: "\n")
-        let height: Int = lines.count
+        let height: UInt = UInt(lines.count)
         var obstacles: [Coord] = []
         var labGuard: Guard?
-        var width = 0
+        var width: UInt = 0
         for (y, line) in lines.enumerated() {
-            width = line.count
+            width = UInt(line.count)
             for (x, character) in line.enumerated() {
                 if character == "#" {
                     obstacles.append(Coord(x, y))
@@ -174,15 +174,13 @@ extension Coord {
 }
 
 struct Map: Equatable {
-    let width: Int
-    let height: Int
+    let width: UInt
+    let height: UInt
     let obstacles: Set<Coord>
 
-    init?(width: Int, height: Int, obstacles: [Coord]) {
+    init?(width: UInt, height: UInt, obstacles: [Coord]) {
         let uniqueObstacles = Set(obstacles)
         guard
-            width >= 0 &&
-            height >= 0 &&
             obstacles.count < width * height &&
             uniqueObstacles.count == obstacles.count &&
             uniqueObstacles.allSatisfy({ $0.isInsideArea(width: width, height: height) })

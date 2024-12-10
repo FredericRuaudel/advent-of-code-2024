@@ -39,7 +39,7 @@ public struct Coord: Equatable, Hashable {
         self.y = y
     }
 
-    public func isInsideArea(width: Int, height: Int) -> Bool {
+    public func isInsideArea(width: UInt, height: UInt) -> Bool {
         x >= 0 && y >= 0 &&
             x < width && y < height
     }
