@@ -25,11 +25,8 @@ struct Day6Tests {
         #expect(Coord(3, 4).y == 4)
     }
 
-    @Test("A valid Map should be created with positive width, height and unique obstacles less than total area and inside area")
+    @Test("A valid Map should be created with width, height and unique obstacles less than total area and inside area")
     func mapCreationTest() throws {
-        #expect(Map(width: -1, height: 2, obstacles: []) == nil)
-        #expect(Map(width: 1, height: -2, obstacles: []) == nil)
-        #expect(Map(width: -1, height: -2, obstacles: []) == nil)
         #expect(Map(width: 0, height: 0, obstacles: []) == nil)
         #expect(Map(width: 1, height: 2, obstacles: []) != nil)
         #expect(Map(width: 10, height: 20, obstacles: []) != nil)

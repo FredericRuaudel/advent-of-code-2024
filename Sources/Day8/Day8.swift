@@ -20,10 +20,10 @@ public final class Day8: AoCDay {
     func scanningAreaForAntennas(using input: String) throws -> Map {
         var antennas = [Antenna]()
         let lines = input.split(separator: "\n")
-        let height = lines.count
-        var width = 0
+        let height = UInt(lines.count)
+        var width: UInt = 0
         for (y, line) in lines.enumerated() {
-            width = line.count
+            width = UInt(line.count)
             for (x, frequency) in line.enumerated() {
                 if frequency != "." {
                     antennas.append(Antenna(position: Coord(x, y), frequency: frequency))
@@ -40,11 +40,11 @@ enum Day8Error: Error {
 }
 
 struct Map: Equatable {
-    var width: Int
-    var height: Int
+    var width: UInt
+    var height: UInt
     var antennaPositionsByFrequencies: [Character: [Coord]]
 
-    init?(width: Int, height: Int, antennas: [Antenna]) {
+    init?(width: UInt, height: UInt, antennas: [Antenna]) {
         guard antennas.count > 1 else { return nil }
         self.width = width
         self.height = height
@@ -96,7 +96,7 @@ extension Pair where A == Coord, B == Coord {
         Coord(first.x + (first.x - second.x), first.y + (first.y - second.y))
     }
 
-    func antinodeAndResonantHarmonicsBeforeAndWithinArea(ofWidth width: Int, height: Int) -> [Coord] {
+    func antinodeAndResonantHarmonicsBeforeAndWithinArea(ofWidth width: UInt, height: UInt) -> [Coord] {
         var antinodeAndResonantHarmonics = [Coord]()
         var currentPair = self
         while currentPair.first.isInsideArea(width: width, height: height) {
@@ -111,7 +111,7 @@ extension Pair where A == Coord, B == Coord {
         Coord(second.x + (second.x - first.x), second.y + (second.y - first.y))
     }
 
-    func antinodeAndResonantHarmonicsAfterAndWithinArea(ofWidth width: Int, height: Int) -> [Coord] {
+    func antinodeAndResonantHarmonicsAfterAndWithinArea(ofWidth width: UInt, height: UInt) -> [Coord] {
         var antinodeAndResonantHarmonics = [Coord]()
         var currentPair = self
         while currentPair.second.isInsideArea(width: width, height: height) {
