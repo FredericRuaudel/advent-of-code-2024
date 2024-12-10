@@ -45,6 +45,26 @@ public struct Coord: Equatable, Hashable {
     }
 }
 
+public enum Direction: Equatable, CaseIterable {
+    case north
+    case east
+    case south
+    case west
+
+    public var offset: Coord {
+        switch self {
+        case .north:
+            Coord(0, -1)
+        case .east:
+            Coord(1, 0)
+        case .south:
+            Coord(0, 1)
+        case .west:
+            Coord(-1, 0)
+        }
+    }
+}
+
 public extension Array where Element: Equatable {
     @discardableResult
     mutating func removeLastOccurrence(of element: Element) -> Element? {

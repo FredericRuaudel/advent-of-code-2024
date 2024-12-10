@@ -52,16 +52,16 @@ extension Array where Element == String {
     }
 
     func allFourLetters(from origin: Coord) -> [String] {
-        Direction.allCases.compactMap { direction in
+        CardinalDirection.allCases.compactMap { direction in
             fourLetters(from: origin, towards: direction)
         }
     }
 
-    func fourLetters(from origin: Coord, towards direction: Direction) -> String? {
+    func fourLetters(from origin: Coord, towards direction: CardinalDirection) -> String? {
         word(from: origin, towards: direction, ofLength: 4)
     }
 
-    func word(from origin: Coord, towards direction: Direction, ofLength count: Int) -> String? {
+    func word(from origin: Coord, towards direction: CardinalDirection, ofLength count: Int) -> String? {
         var result = ""
         var nextCoord = origin
         while result.count < count {
@@ -85,11 +85,11 @@ extension Array where Element == String {
 
     func crossWords(centeredAt center: Coord) -> Pair<String>? {
         guard
-            let northWestLetter = char(at: center + Direction.northWest.offset),
-            let northEastLetter = char(at: center + Direction.northEast.offset),
+            let northWestLetter = char(at: center + CardinalDirection.northWest.offset),
+            let northEastLetter = char(at: center + CardinalDirection.northEast.offset),
             let centerLetter = char(at: center),
-            let southWestLetter = char(at: center + Direction.southWest.offset),
-            let southEastLetter = char(at: center + Direction.southEast.offset)
+            let southWestLetter = char(at: center + CardinalDirection.southWest.offset),
+            let southEastLetter = char(at: center + CardinalDirection.southEast.offset)
         else {
             return nil
         }
@@ -107,7 +107,7 @@ extension Coord {
     }
 }
 
-enum Direction: Equatable, CaseIterable {
+enum CardinalDirection: Equatable, CaseIterable {
     case north
     case northEast
     case east
