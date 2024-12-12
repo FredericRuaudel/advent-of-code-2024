@@ -171,10 +171,10 @@ struct Day11Tests {
         #expect(observer != nil)
 
         #expect(observer?.stones == [
-            Stone(number: 42),
-            Stone(number: 123),
-            Stone(number: 0),
-            Stone(number: 1000),
+            Stone(number: 42): 1,
+            Stone(number: 123): 1,
+            Stone(number: 0): 1,
+            Stone(number: 1000): 1,
         ])
 
         let anotherInput = "1 2 3 4 5"
@@ -182,11 +182,21 @@ struct Day11Tests {
         #expect(anotherObserver != nil)
 
         #expect(anotherObserver?.stones == [
-            Stone(number: 1),
-            Stone(number: 2),
-            Stone(number: 3),
-            Stone(number: 4),
-            Stone(number: 5),
+            Stone(number: 1): 1,
+            Stone(number: 2): 1,
+            Stone(number: 3): 1,
+            Stone(number: 4): 1,
+            Stone(number: 5): 1,
+        ])
+
+        let duplicatesInput = "42 42 0 42 1000 0"
+        let duplicatesObserver = Observer(environment: duplicatesInput)
+        #expect(duplicatesObserver != nil)
+
+        #expect(duplicatesObserver?.stones == [
+            Stone(number: 42): 3,
+            Stone(number: 0): 2,
+            Stone(number: 1000): 1,
         ])
     }
 
@@ -203,6 +213,10 @@ struct Day11Tests {
         let singleStoneInput = "42"
         let singleStoneObserver = Observer(environment: singleStoneInput)
         #expect(singleStoneObserver?.visibleStones == 1)
+
+        let duplicatesInput = "42 42 0 42 1000 0"
+        let duplicatesObserver = Observer(environment: duplicatesInput)
+        #expect(duplicatesObserver?.visibleStones == 6)
     }
 
     @Test("Observer should have a blink method that evolves stones the specified number of times")
@@ -215,11 +229,11 @@ struct Day11Tests {
         // 2 becomes 4048 (2 * 2024)
         // 42 becomes 4 and 2 (split)
         observer?.blink(count: 1)
-        #expect(observer?.stones == [
-            Stone(number: 1),
-            Stone(number: 4048),
-            Stone(number: 4),
-            Stone(number: 2),
+        expectNoDifference(observer?.stones, [
+            Stone(number: 1): 1,
+            Stone(number: 4048): 1,
+            Stone(number: 4): 1,
+            Stone(number: 2): 1,
         ])
 
         // After another blink:
@@ -228,22 +242,23 @@ struct Day11Tests {
         // 4 becomes 8096
         // 2 becomes 4048
         observer?.blink(count: 1)
-        #expect(observer?.stones == [
-            Stone(number: 2024),
-            Stone(number: 40),
-            Stone(number: 48),
-            Stone(number: 8096),
-            Stone(number: 4048),
+        expectNoDifference(observer?.stones, [
+            Stone(number: 2024): 1,
+            Stone(number: 40): 1,
+            Stone(number: 48): 1,
+            Stone(number: 8096): 1,
+            Stone(number: 4048): 1,
         ])
 
         // Test multiple blinks at once
         let anotherInput = "0"
         let anotherObserver = Observer(environment: anotherInput)
-        anotherObserver?.blink(count: 3)
-        // 0 -> 1 -> 2024 -> 20 24
-        #expect(anotherObserver?.stones == [
-            Stone(number: 20),
-            Stone(number: 24),
+        anotherObserver?.blink(count: 4)
+        // 0 -> 1 -> 2024 -> 20 24 -> 2 0 2 4
+        expectNoDifference(anotherObserver?.stones, [
+            Stone(number: 2): 2,
+            Stone(number: 0): 1,
+            Stone(number: 4): 1,
         ])
     }
 
@@ -253,9 +268,29 @@ struct Day11Tests {
         #expect(part1 == "55312")
     }
 
-    @Test("Part2 with challenge example input")
-    func exampleInputPart2() throws {
-        let part2 = try Day11().runPart2(with: inputPart)
-        #expect(part2 == "")
+    @Test("Subsequence of UInt should have a method merge that concatenates digits")
+    func uintArrayMergeTest() {
+        let numbers: [UInt] = [1, 2, 3, 4]
+        #expect(numbers[...].merge() == 1234)
+        #expect(numbers[0 ... 2].merge() == 123)
+
+        let moreNumbers: [UInt] = [5, 0, 2, 8]
+        #expect(moreNumbers[...].merge() == 5028)
+        #expect(moreNumbers[1 ... 3].merge() == 28)
     }
+
+    // @Test("UInt split should return tuple of UInt for even digit numbers or nil for odd digit numbers")
+    // func uintSplitTest() throws {
+    //     // Even digit numbers should split into two equal parts
+    //     // #expect(try #require(UInt(1234).split()) == (12, 34))
+    //     // #expect(try #require(UInt(123_456).split()) == (123, 456))
+    //     // #expect(try #require(UInt(10_203_040).split()) == (1020, 3040))
+    //     #expect(try! #require(UInt(1000).split()).0 == 10)
+    //     #expect(try! #require(UInt(1000).split()).1 == 0)
+
+    //     // Odd digit numbers should return nil
+    //     // #expect(UInt(123).split() == nil)
+    //     // #expect(UInt(12345).split() == nil)
+    //     // #expect(UInt(1).split() == nil)
+    // }
 }
