@@ -186,7 +186,7 @@ let package = Package(
         ),
         .target(name: "Day11", dependencies: [
             "Core",
-            Dependency.algorithms,
+            Dependency.issueReporting,
         ]),
         .testTarget(
             name: "Day11Tests",
