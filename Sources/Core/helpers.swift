@@ -56,6 +56,16 @@ public struct Coord: Equatable, Hashable {
             x < width && y < height
     }
 
+    public var neighbours: [Coord] {
+        Direction.allCases.map(\.offset).map { self + $0 }
+    }
+
+    public func neighboursInsideArea(ofWidth width: UInt, height: UInt) -> [Coord] {
+        return neighbours.filter { position in
+            position.isInsideArea(width: width, height: height)
+        }
+    }
+
     public static func + (_ lhs: Self, _ rhs: Self) -> Self {
         Coord(lhs.x + rhs.x, lhs.y + rhs.y)
     }
