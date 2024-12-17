@@ -79,7 +79,7 @@ struct TopographicMap: Equatable {
     }
 
     func pointPositions(around position: Coord, atElevation elevation: UInt) -> [Coord] {
-        let allAdjacentPositions = position.neighboursInsideArea(ofWidth: width, height: height)
+        let allAdjacentPositions = position.neighboursInsideArea(ofWidth: width, height: height).map(\.position)
         return allAdjacentPositions.filter { position in
             self.points[position.y][position.x].elevation == elevation
         }

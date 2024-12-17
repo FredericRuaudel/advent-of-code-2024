@@ -233,37 +233,37 @@ struct Day12Tests {
         #expect(garden2.height == 2)
     }
 
-    @Test("Coord has neighbours method that returns adjacent coordinates")
+    @Test("Coord has neighbours method that returns adjacent coordinates with directions")
     func coordNeighboursMethod() {
         let coord = Coord(1, 1)
         let expectedNeighbours = [
-            Coord(1, 0), // north
-            Coord(2, 1), // east
-            Coord(1, 2), // south
-            Coord(0, 1), // west
+            Neighbour(position: Coord(1, 0), direction: .north),
+            Neighbour(position: Coord(2, 1), direction: .east),
+            Neighbour(position: Coord(1, 2), direction: .south),
+            Neighbour(position: Coord(0, 1), direction: .west),
         ]
 
         expectNoDifference(coord.neighbours, expectedNeighbours)
 
         let coord2 = Coord(0, 0)
         let expectedNeighbours2 = [
-            Coord(0, -1), // north
-            Coord(1, 0), // east
-            Coord(0, 1), // south
-            Coord(-1, 0), // west
+            Neighbour(position: Coord(0, -1), direction: .north),
+            Neighbour(position: Coord(1, 0), direction: .east),
+            Neighbour(position: Coord(0, 1), direction: .south),
+            Neighbour(position: Coord(-1, 0), direction: .west),
         ]
 
         expectNoDifference(coord2.neighbours, expectedNeighbours2)
     }
 
-    @Test("Coord has neighboursInsideArea method that returns all adjacent coordinates inside given area")
+    @Test("Coord has neighboursInsideArea method that returns all adjacent coordinates with directions inside given area")
     func coordNeighbours() {
         let coord = Coord(1, 1)
         let neighbours = [
-            Coord(1, 0), // north
-            Coord(2, 1), // east
-            Coord(1, 2), // south
-            Coord(0, 1), // west
+            Neighbour(position: Coord(1, 0), direction: .north),
+            Neighbour(position: Coord(2, 1), direction: .east),
+            Neighbour(position: Coord(1, 2), direction: .south),
+            Neighbour(position: Coord(0, 1), direction: .west),
         ]
 
         expectNoDifference(coord.neighboursInsideArea(ofWidth: 3, height: 3), neighbours)
@@ -271,8 +271,8 @@ struct Day12Tests {
         // Test edge case
         let edgeCoord = Coord(0, 0)
         let edgeNeighbours = [
-            Coord(1, 0), // east
-            Coord(0, 1), // south
+            Neighbour(position: Coord(1, 0), direction: .east),
+            Neighbour(position: Coord(0, 1), direction: .south),
         ]
 
         expectNoDifference(edgeCoord.neighboursInsideArea(ofWidth: 2, height: 2), edgeNeighbours)
@@ -280,9 +280,9 @@ struct Day12Tests {
         // Test another edge case
         let cornerCoord = Coord(0, 1)
         let cornerNeighbours = [
-            Coord(0, 0), // north
-            Coord(1, 1), // east
-            Coord(0, 2), // south
+            Neighbour(position: Coord(0, 0), direction: .north),
+            Neighbour(position: Coord(1, 1), direction: .east),
+            Neighbour(position: Coord(0, 2), direction: .south),
         ]
 
         expectNoDifference(cornerCoord.neighboursInsideArea(ofWidth: 2, height: 3), cornerNeighbours)
@@ -290,8 +290,8 @@ struct Day12Tests {
         // Test filtering coordinates outside area
         let nearEdgeCoord = Coord(1, 1)
         let filteredNeighbours = [
-            Coord(1, 0), // north
-            Coord(0, 1), // west
+            Neighbour(position: Coord(1, 0), direction: .north),
+            Neighbour(position: Coord(0, 1), direction: .west),
         ]
 
         expectNoDifference(nearEdgeCoord.neighboursInsideArea(ofWidth: 2, height: 2), filteredNeighbours)
@@ -370,9 +370,128 @@ struct Day12Tests {
         #expect(part1 == "1930")
     }
 
+    @Test("Neighbour has position and direction")
+    func neighbourProperties() throws {
+        let position = Coord(1, 2)
+        let direction = Direction.north
+        let neighbour = Neighbour(position: position, direction: direction)
+
+        #expect(neighbour.position == position)
+        #expect(neighbour.direction == direction)
+    }
+
+    @Test("Coord can return value in a given axe")
+    func coordValueInAxe() throws {
+        let coord = Coord(2, 3)
+
+        #expect(coord.value(inAxe: .east) == 2)
+        #expect(coord.value(inAxe: .west) == 2)
+        #expect(coord.value(inAxe: .north) == 3)
+        #expect(coord.value(inAxe: .south) == 3)
+    }
+
+    @Test("Int can tell if it is sequentially increasing to another Int")
+    func isSequentiallyIncreasingTest() throws {
+        #expect(1.isSequentiallyIncreasing(to: 2) == true)
+        #expect(2.isSequentiallyIncreasing(to: 3) == true)
+        #expect(1.isSequentiallyIncreasing(to: 3) == false)
+        #expect(2.isSequentiallyIncreasing(to: 1) == false)
+        #expect(1.isSequentiallyIncreasing(to: 1) == false)
+    }
+
+    @Test("Array of Int can count its number of consecutive groups after sorting")
+    func consecutiveGroupCountTest() throws {
+        #expect([1, 2, 3].consecutiveGroupCount() == 1)
+        #expect([1, 3, 5].consecutiveGroupCount() == 3)
+        #expect([1, 2, 4, 5, 7].consecutiveGroupCount() == 3)
+        #expect([1, 3, 4, 5, 7, 8, 10].consecutiveGroupCount() == 4)
+        #expect([3, 1, 4, 5, 2].consecutiveGroupCount() == 1) // [1,2,3,4,5] -> 1 group
+        #expect([5, 2, 1, 9, 8, 7].consecutiveGroupCount() == 3) // [1,2, 5, 7,8,9] -> 3 groups
+        #expect([Int]().consecutiveGroupCount() == 0)
+        #expect([1].consecutiveGroupCount() == 1)
+    }
+
+    @Test("Coord can return value in orthogonal axe")
+    func coordValueInOrthogonalAxe() throws {
+        let coord = Coord(2, 3)
+
+        #expect(coord.value(orthogonalOfAxe: .north) == 2)
+        #expect(coord.value(orthogonalOfAxe: .south) == 2)
+        #expect(coord.value(orthogonalOfAxe: .east) == 3)
+        #expect(coord.value(orthogonalOfAxe: .west) == 3)
+    }
+
+    @Test("Region can count its number of sides")
+    func regionSides() throws {
+        // Single plot region (square) has 4 sides
+        let singlePlotRegion = Region(plotLocations: [Coord(0, 0)], plantType: "O")
+        #expect(singlePlotRegion.sides == 4)
+
+        // Two connected plots in a line have 4 sides
+        let twoPlotRegion = Region(plotLocations: [
+            Coord(0, 0),
+            Coord(1, 0),
+        ], plantType: "I")
+        #expect(twoPlotRegion.sides == 4)
+
+        // L-shaped region with 3 plots has 8 sides
+        let lShapedRegion = Region(plotLocations: [
+            Coord(0, 0),
+            Coord(1, 0),
+            Coord(1, 1),
+        ], plantType: "L")
+        #expect(lShapedRegion.sides == 6)
+
+        // H-shaped region with 6 plots has 12 sides
+        let hShapedRegion = Region(plotLocations: [
+            Coord(0, 0),
+            Coord(0, 1),
+            Coord(0, 2),
+            Coord(1, 1),
+            Coord(2, 0),
+            Coord(2, 1),
+            Coord(2, 2),
+        ], plantType: "H")
+        #expect(hShapedRegion.sides == 12)
+    }
+
+    @Test("Region can calculate its discounted price")
+    func regionDiscountedPrice() throws {
+        // Single plot region (square) has area 1 and 4 sides -> price = 4
+        let singlePlotRegion = Region(plotLocations: [Coord(0, 0)], plantType: "O")
+        #expect(singlePlotRegion.discountedPrice == 4)
+
+        // Two connected plots in a line have area 2 and 4 sides -> price = 8
+        let twoPlotRegion = Region(plotLocations: [
+            Coord(0, 0),
+            Coord(1, 0),
+        ], plantType: "I")
+        #expect(twoPlotRegion.discountedPrice == 8)
+
+        // L-shaped region with 3 plots has area 3 and 6 sides -> price = 18
+        let lShapedRegion = Region(plotLocations: [
+            Coord(0, 0),
+            Coord(1, 0),
+            Coord(1, 1),
+        ], plantType: "L")
+        #expect(lShapedRegion.discountedPrice == 18)
+
+        // H-shaped region with 7 plots has area 7 and 12 sides -> price = 84
+        let hShapedRegion = Region(plotLocations: [
+            Coord(0, 0),
+            Coord(0, 1),
+            Coord(0, 2),
+            Coord(1, 1),
+            Coord(2, 0),
+            Coord(2, 1),
+            Coord(2, 2),
+        ], plantType: "H")
+        #expect(hShapedRegion.discountedPrice == 84)
+    }
+
     @Test("Part2 with challenge example input")
     func exampleInputPart2() throws {
         let part2 = try Day12().runPart2(with: inputPart)
-        #expect(part2 == "")
+        #expect(part2 == "1206")
     }
 }

@@ -28,6 +28,10 @@ public extension Int {
     func asText() -> String {
         "\(self)"
     }
+
+    func isSequentiallyIncreasing(to other: Self) -> Bool {
+        self + 1 == other
+    }
 }
 
 public extension Array where Element == UInt {
@@ -39,6 +43,14 @@ public extension Array where Element == UInt {
 public extension Array where Element == Int {
     func sum() -> Int {
         reduce(0,+)
+    }
+
+    func consecutiveGroupCount() -> UInt {
+        sorted().reduce(into: (count: 0, previous: Int?.none)) { result, value in
+            defer { result.previous = value }
+            if result.previous?.isSequentiallyIncreasing(to: value) == true { return }
+            result.count += 1
+        }.count
     }
 }
 
@@ -56,18 +68,46 @@ public struct Coord: Equatable, Hashable {
             x < width && y < height
     }
 
-    public var neighbours: [Coord] {
-        Direction.allCases.map(\.offset).map { self + $0 }
+    public var neighbours: [Neighbour] {
+        Direction.allCases.map { Neighbour(position: self + $0.offset, direction: $0) }
     }
 
-    public func neighboursInsideArea(ofWidth width: UInt, height: UInt) -> [Coord] {
-        return neighbours.filter { position in
-            position.isInsideArea(width: width, height: height)
+    public func neighboursInsideArea(ofWidth width: UInt, height: UInt) -> [Neighbour] {
+        return neighbours.filter { neighbour in
+            neighbour.position.isInsideArea(width: width, height: height)
+        }
+    }
+
+    public func value(inAxe direction: Direction) -> Int {
+        switch direction {
+        case .north, .south:
+            y
+        case .east, .west:
+            x
+        }
+    }
+
+    public func value(orthogonalOfAxe direction: Direction) -> Int {
+        switch direction {
+        case .north, .south:
+            x
+        case .east, .west:
+            y
         }
     }
 
     public static func + (_ lhs: Self, _ rhs: Self) -> Self {
         Coord(lhs.x + rhs.x, lhs.y + rhs.y)
+    }
+}
+
+public struct Neighbour: Equatable, Hashable {
+    public var position: Coord
+    public var direction: Direction
+
+    public init(position: Coord, direction: Direction) {
+        self.position = position
+        self.direction = direction
     }
 }
 
