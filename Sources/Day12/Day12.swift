@@ -11,8 +11,10 @@ public final class Day12: AoCDay {
         return regions.map(\.price).sum().asText()
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        guard let garden = Garden(inventoryMap: input) else { throw Day12Error.invalidInput }
+        let regions = garden.mapAllRegions()
+        return regions.map(\.discountedPrice).sum().asText()
     }
 }
 
@@ -61,20 +63,20 @@ class Garden {
     }
 
     private func findAllNeighbours(
-        of plantPlot: PlantPlot, 
+        of plantPlot: PlantPlot,
         currentNeighbourPlantPlots: [PlantPlot] = []
     ) -> [PlantPlot] {
         let newSameRegionNeighbours = plantPlot.location.neighboursInsideArea(ofWidth: width, height: height)
-            .filter { 
-                guard let neighbourPlantPlot = self.plantPlot(at: $0) else { return false }
-                return neighbourPlantPlot.type == plantPlot.type && currentNeighbourPlantPlots.contains(neighbourPlantPlot) == false 
+            .filter {
+                guard let neighbourPlantPlot = self.plantPlot(at: $0.position) else { return false }
+                return neighbourPlantPlot.type == plantPlot.type && currentNeighbourPlantPlots.contains(neighbourPlantPlot) == false
             }
         let updatedNeighbourPlantPlots = currentNeighbourPlantPlots + [plantPlot]
 
         guard newSameRegionNeighbours.isEmpty == false else { return updatedNeighbourPlantPlots }
 
-        return newSameRegionNeighbours.reduce(into: updatedNeighbourPlantPlots) { updatedNeighbourPlantPlotsSoFar, location in 
-            guard let neighbourPlantPlot = self.plantPlot(at: location) else { return }
+        return newSameRegionNeighbours.reduce(into: updatedNeighbourPlantPlots) { updatedNeighbourPlantPlotsSoFar, neighbour in
+            guard let neighbourPlantPlot = self.plantPlot(at: neighbour.position) else { return }
             updatedNeighbourPlantPlotsSoFar.append(
                 contentsOf: findAllNeighbours(of: neighbourPlantPlot, currentNeighbourPlantPlots: updatedNeighbourPlantPlotsSoFar)
             )
@@ -90,9 +92,29 @@ struct Region: Equatable {
         plotLocations.reduce(into: UInt(0)) { sum, location in
             sum += UInt(
                 location.neighbours
-                    .filter { plotLocations.contains($0) == false }
-                    .count
+                    .count { plotLocations.contains($0.position) == false }
             )
+        }
+    }
+
+    var sides: UInt {
+        let allNeighbours = plotLocations.flatMap(\.neighbours)
+            .filter { plotLocations.contains($0.position) == false }
+
+        struct Key: Hashable {
+            let direction: Direction
+            let axeValue: Int
+        }
+
+        let groupedNeighbours = Dictionary(grouping: allNeighbours) { neighbour in
+            Key(direction: neighbour.direction, axeValue: neighbour.position.value(inAxe: neighbour.direction))
+        }
+
+        return groupedNeighbours.values.map { neighbours in
+            neighbours.map { $0.position.value(orthogonalOfAxe: $0.direction) }
+        }
+        .reduce(into: 0) { count, values in
+            count += values.consecutiveGroupCount()
         }
     }
 
@@ -102,6 +124,10 @@ struct Region: Equatable {
 
     var price: UInt {
         area * perimeter
+    }
+
+    var discountedPrice: UInt {
+        area * sides
     }
 }
 
