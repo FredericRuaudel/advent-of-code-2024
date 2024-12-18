@@ -291,6 +291,6 @@ struct Day13Tests {
     @Test("Part2 with challenge example input")
     func exampleInputPart2() throws {
         let part2 = try Day13().runPart2(with: inputPart)
-        #expect(part2 == "")
+        #expect(part2 == "875318608908")
     }
 }

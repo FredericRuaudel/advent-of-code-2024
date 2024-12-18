@@ -9,14 +9,25 @@ public final class Day13: AoCDay {
         return clawMachines.map(\.tokenCost).sum().asText()
     }
 
-    public func runPart2(with _: String) throws -> String {
-        ""
+    public func runPart2(with input: String) throws -> String {
+        let precisionUpdate = 10_000_000_000_000
+        let clawMachines = try AllClawMachineParser().parse(input)
+        return clawMachines.compactMap {
+            ClawMachine(
+                buttonAOffset: $0.buttonAOffset,
+                buttonBOffset: $0.buttonBOffset,
+                prizeLocation: Coord(
+                    $0.prizeLocation.x + precisionUpdate,
+                    $0.prizeLocation.y + precisionUpdate
+                )
+            )
+        }.map(\.tokenCost).sum().asText()
     }
 }
 
 struct AllClawMachineParser: Parser {
     var body: some Parser<Substring, [ClawMachine]> {
-        Many(into: []) { (result: inout [ClawMachine], clawMachine: ClawMachine?) in 
+        Many(into: []) { (result: inout [ClawMachine], clawMachine: ClawMachine?) in
             guard let clawMachine else { return }
             result.append(clawMachine)
         } element: {
