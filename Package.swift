@@ -214,7 +214,7 @@ let package = Package(
         ),
         .target(name: "Day13", dependencies: [
             "Core",
-            Dependency.algorithms,
+            Dependency.parsing,
         ]),
         .testTarget(
             name: "Day13Tests",
