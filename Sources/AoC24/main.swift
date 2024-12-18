@@ -3,6 +3,7 @@ import Day1
 import Day10
 import Day11
 import Day12
+import Day13
 import Day2
 import Day3
 import Day4
@@ -25,4 +26,5 @@ try AoC24.run(day: 8, using: Day8.self)
 // try AoC24.run(day: 9, using: Day9.self)
 try AoC24.run(day: 10, using: Day10.self)
 try AoC24.run(day: 11, using: Day11.self)
-try AoC24.run(day: 12, using: Day12.self)
+// try AoC24.run(day: 12, using: Day12.self)
+try AoC24.run(day: 13, using: Day13.self)
