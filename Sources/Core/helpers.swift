@@ -99,6 +99,20 @@ public struct Coord: Equatable, Hashable {
     public static func + (_ lhs: Self, _ rhs: Self) -> Self {
         Coord(lhs.x + rhs.x, lhs.y + rhs.y)
     }
+
+    public static func * (_ lhs: Self, _ rhs: Int) -> Self {
+        Coord(
+            lhs.x * rhs,
+            lhs.y * rhs
+        )
+    }
+
+    public static func * (_ lhs: Int, _ rhs: Self) -> Self {
+        Coord(
+            lhs * rhs.x,
+            lhs * rhs.y
+        )
+    }
 }
 
 public struct Neighbour: Equatable, Hashable {
